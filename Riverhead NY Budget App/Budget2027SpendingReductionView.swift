@@ -20,6 +20,7 @@ private struct SpendingReductionItem: Identifiable {
     let amount: Double
     let source: String
     let rationale: String
+    var confidence: String? = nil   // "firm" | "moderate" | "volatile" (supplement trims)
 }
 
 @MainActor
@@ -88,8 +89,37 @@ struct Budget2027SpendingReductionView: View {
             .sorted { $0.amount > $1.amount }
     }
 
+    // Itemized, ledger-sourced trims from the 2026 Budget Supplement: every
+    // controllable, non-mandated line budgeted above its trailing run-rate.
+    private var supplementItems: [SpendingReductionItem] {
+        (SupplementData.reductions?.items ?? []).map { r in
+            .init(
+                id: "supp-\(r.account)",
+                title: r.name,
+                amount: r.target,
+                source: "\(r.fundName) — 2026 tentative \(usd(r.tentative2026)) vs 2024 actual \(usd(r.actual2024)); trims to the trailing run-rate",
+                rationale: Self.confidenceRationale(r.confidence),
+                confidence: r.confidence
+            )
+        }
+        .sorted { $0.amount > $1.amount }
+    }
+
     private var allItems: [SpendingReductionItem] {
-        personnelPolicyItems + operationalItems
+        personnelPolicyItems + operationalItems + supplementItems
+    }
+
+    private func usd(_ v: Double?) -> String {
+        (v ?? 0).formatted(.currency(code: "USD").precision(.fractionLength(0)))
+    }
+
+    private static func confidenceRationale(_ c: String) -> String {
+        switch c {
+        case "firm": return "Operating or professional-services line budgeted well above its own trailing actuals — the firmest kind of trim."
+        case "moderate": return "Capital or maintenance line that fluctuates year to year; the trim depends on 2027 project timing."
+        case "volatile": return "Price-driven (fuel, energy, utilities); the excess over trend is real but not guaranteed to recur."
+        default: return ""
+        }
     }
 
     private func isSelected(_ item: SpendingReductionItem) -> Bool {
@@ -102,18 +132,23 @@ struct Budget2027SpendingReductionView: View {
 
     private var personnelPolicySelectedTotal: Double { selectedTotal(personnelPolicyItems) }
     private var operationalSelectedTotal: Double { selectedTotal(operationalItems) }
-    private var grandSelectedTotal: Double { personnelPolicySelectedTotal + operationalSelectedTotal }
+    private var supplementSelectedTotal: Double { selectedTotal(supplementItems) }
+    private var grandSelectedTotal: Double { personnelPolicySelectedTotal + operationalSelectedTotal + supplementSelectedTotal }
 
     private var personnelPolicyFullTotal: Double { Budget2027TaxCapOffsetModel.recurringSavingsPackageTotal }
     private var operationalFullTotal: Double { DepartmentBudgetLensData.operationalGrowthControlTotal }
-    private var grandFullTotal: Double { personnelPolicyFullTotal + operationalFullTotal }
+    private var supplementFullTotal: Double { SupplementData.reductions?.total ?? 0 }
+    private var grandFullTotal: Double { personnelPolicyFullTotal + operationalFullTotal + supplementFullTotal }
 
     private var payrollPressureGap: Double { Budget2027ScenarioModel.modeledAutomaticPayrollPressure }
 
-    private var gapCoverage: Double {
+    // Uncapped ratio — can (and now does) exceed 100%, which is the headline:
+    // verified trims cover the gap several times over.
+    private var rawGapCoverage: Double {
         guard payrollPressureGap > 0 else { return 0 }
-        return min(grandSelectedTotal / payrollPressureGap, 1.0)
+        return grandSelectedTotal / payrollPressureGap
     }
+    private var gapCoverage: Double { min(rawGapCoverage, 1.0) }
 
     var body: some View {
         List {
@@ -133,9 +168,17 @@ struct Budget2027SpendingReductionView: View {
                 }
                 .padding(.vertical, 6)
 
-                HStack {
-                    metricTile(title: "Personnel & policy", value: personnelPolicySelectedTotal, tint: RiverheadTheme.brandNavy)
-                    metricTile(title: "Operational growth control", value: operationalSelectedTotal, tint: RiverheadTheme.brandCoral)
+                ViewThatFits(in: .horizontal) {
+                    HStack {
+                        metricTile(title: "Personnel & policy", value: personnelPolicySelectedTotal, tint: RiverheadTheme.brandNavy)
+                        metricTile(title: "Operational control", value: operationalSelectedTotal, tint: RiverheadTheme.brandCoral)
+                        metricTile(title: "Line-item trims", value: supplementSelectedTotal, tint: RiverheadTheme.brandSky)
+                    }
+                    VStack {
+                        metricTile(title: "Personnel & policy", value: personnelPolicySelectedTotal, tint: RiverheadTheme.brandNavy)
+                        metricTile(title: "Operational control", value: operationalSelectedTotal, tint: RiverheadTheme.brandCoral)
+                        metricTile(title: "Line-item trims", value: supplementSelectedTotal, tint: RiverheadTheme.brandSky)
+                    }
                 }
 
                 HStack {
@@ -187,6 +230,18 @@ struct Budget2027SpendingReductionView: View {
             } footer: {
                 Text("Real account-level growth from the 2026 Budget Supplement, flagged for Board scrutiny before being carried forward as a permanent baseline. Excludes the new Peconic Hockey electricity line ($167,742), which is a same-fund reclassification, not net-new spending — the general Town Hall electricity line drops by the same amount.")
             }
+
+            if !supplementItems.isEmpty {
+                Section {
+                    ForEach(supplementItems) { item in
+                        itemRow(item)
+                    }
+                } header: {
+                    Text("Line-Item Trims · 2026 Supplement — \(supplementSelectedTotal, format: .currency(code: "USD").precision(.fractionLength(0))) of \(supplementFullTotal, format: .currency(code: "USD").precision(.fractionLength(0)))")
+                } footer: {
+                    Text("Every controllable, non-mandated line the 2026 Budget Supplement budgets more than 30% above its own trailing actuals — trimmed back to that run-rate. Tagged FIRM (operating/professional services), MODERATE (capital/maintenance that fluctuates), or VOLATILE (price-driven fuel and energy). Mandated costs — pension, workers' comp, insurance, debt service — are excluded, since their growth is obligation, not waste.")
+                }
+            }
         }
         .navigationTitle("2027 Spending Reduction")
         .navigationBarTitleDisplayMode(.inline)
@@ -205,10 +260,27 @@ struct Budget2027SpendingReductionView: View {
             }
             .frame(height: 8)
 
-            Text("\(gapCoverage.formatted(.percent.precision(.fractionLength(0)))) of the \(payrollPressureGap, format: .currency(code: "USD").precision(.fractionLength(0))) modeled 2027 payroll-pressure gap")
+            Text("\(rawGapCoverage.formatted(.percent.precision(.fractionLength(0)))) of the \(payrollPressureGap, format: .currency(code: "USD").precision(.fractionLength(0))) modeled 2027 payroll-pressure gap\(rawGapCoverage >= 1 ? " — fully covered" : "")")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
+    }
+
+    private func confidenceBadge(_ c: String) -> some View {
+        let (label, tint): (String, Color) = {
+            switch c {
+            case "firm": return ("FIRM", RiverheadTheme.brandMint)
+            case "moderate": return ("MODERATE", RiverheadTheme.brandGold)
+            case "volatile": return ("VOLATILE", RiverheadTheme.brandCoral)
+            default: return (c.uppercased(), .secondary)
+            }
+        }()
+        return Text(label)
+            .font(.caption2.weight(.bold))
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(tint.opacity(0.16), in: Capsule())
+            .foregroundStyle(tint)
     }
 
     private func metricTile(title: String, value: Double, tint: Color) -> some View {
@@ -252,6 +324,9 @@ struct Budget2027SpendingReductionView: View {
                         Text(item.title)
                             .font(.headline)
                             .foregroundStyle(.primary)
+                        if let c = item.confidence {
+                            confidenceBadge(c)
+                        }
                         Spacer(minLength: 12)
                         Text(item.amount, format: .currency(code: "USD"))
                             .font(.subheadline.weight(.bold))
