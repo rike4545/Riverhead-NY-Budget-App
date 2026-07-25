@@ -273,9 +273,75 @@ struct BudgetAccuracyWatchlistView: View {
                     .padding(.vertical, 8)
                 }
             }
+
+            dataDrivenSections
         }
         .navigationTitle("Budget Accuracy")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    // MARK: - Data-driven flags (from the shared Supplement ETL)
+
+    @ViewBuilder
+    private var dataDrivenSections: some View {
+        if let o = SupplementData.outliers {
+            Section {
+                Text("Beyond the curated flags above, these are auto-detected across all ~1,700 expenditure lines in the 2026 Supplement. Mandated costs (pension, workers' comp, insurance, debt service) and revenue are excluded — their variance is obligation or timing, not waste.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Data-Detected · 2026 Supplement")
+            }
+
+            outlierSection(
+                "Over-Budget vs. Trailing Actuals",
+                subtitle: "Controllable lines budgeted >30% above their run-rate. Recoverable pool: \(o.recoverablePoolControllable.formatted(.currency(code: "USD").precision(.fractionLength(0)))).",
+                items: o.overBudget, tint: RiverheadTheme.brandCoral, amountLabel: "over"
+            )
+            outlierSection(
+                "Chronic Overruns",
+                subtitle: "2024 actual ran well above the 2025 adopted budget — a sign the baseline is unrealistic.",
+                items: o.chronicOverrun, tint: .orange, amountLabel: "over budget"
+            )
+            outlierSection(
+                "Spending With No Budget",
+                subtitle: "Real spending on lines the 2025 budget set to zero (interfund transfers excluded).",
+                items: o.noBudget, tint: .red, amountLabel: "spent"
+            )
+        }
+    }
+
+    @ViewBuilder
+    private func outlierSection(_ title: String, subtitle: String, items: [SupplementOutlier], tint: Color, amountLabel: String) -> some View {
+        if !items.isEmpty {
+            Section {
+                ForEach(items.prefix(12)) { item in
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack(alignment: .firstTextBaseline) {
+                            Text(item.name)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.primary)
+                            Spacer(minLength: 8)
+                            Text(item.excess, format: .currency(code: "USD").precision(.fractionLength(0)))
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(tint)
+                        }
+                        Text("\(item.fund) · 2024 actual \(usd(item.actual2024)) → 2026 tentative \(usd(item.tentative2026)) · \(amountLabel)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 2)
+                }
+            } header: {
+                Text("\(title) — \(items.count)")
+            } footer: {
+                Text(subtitle)
+            }
+        }
+    }
+
+    private func usd(_ v: Double?) -> String {
+        (v ?? 0).formatted(.currency(code: "USD").precision(.fractionLength(0)))
     }
 
     private func metricRow(_ title: String, value: String, tint: Color) -> some View {

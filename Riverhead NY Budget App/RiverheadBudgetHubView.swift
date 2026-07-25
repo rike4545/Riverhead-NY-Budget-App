@@ -337,6 +337,7 @@ fileprivate enum BudgetToolDestination {
     case earlyRetirementModel
     case spendingReduction
     case communityPreservationFund
+    case lineItemLedger
 }
 
 fileprivate struct BudgetToolShortcut: Identifiable {
@@ -374,6 +375,7 @@ fileprivate struct BudgetToolsDirectoryView: View {
             title: "Evidence And Detail",
             shortcuts: [
                 .init(title: "Supplement Explorer", subtitle: "Annual report, surplus, tax-cut, and labor-pressure details.", symbol: "doc.text.magnifyingglass", destination: .section(.supplementExplorer)),
+                .init(title: "Line-Item Ledger", subtitle: "Every account with 4 years of actuals vs. budget and variance — from the 2025/2026 Supplements.", symbol: "tablecells.fill", destination: .lineItemLedger),
                 .init(title: "Outliers", subtitle: "Budget accuracy, variances, and unusual lines.", symbol: "exclamationmark.triangle.fill", destination: .section(.outliers)),
                 .init(title: "Employees", subtitle: "Payroll and public earnings views.", symbol: "person.2.fill", destination: .section(.employees)),
                 .init(title: "Glossary", subtitle: "Plain-language definitions for budget terms.", symbol: "text.book.closed.fill", destination: .section(.glossary))
@@ -455,6 +457,13 @@ fileprivate struct BudgetToolsDirectoryView: View {
         case .communityPreservationFund:
             NavigationLink {
                 CommunityPreservationFundView()
+            } label: {
+                rowContent(shortcut)
+            }
+            .buttonStyle(.plain)
+        case .lineItemLedger:
+            NavigationLink {
+                SupplementLineExplorerView()
             } label: {
                 rowContent(shortcut)
             }
