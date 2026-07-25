@@ -849,6 +849,7 @@ Always confirm with:
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(primaryText)
                     .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Text(subtitle)
                     .font(.footnote)

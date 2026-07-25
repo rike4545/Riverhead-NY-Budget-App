@@ -2244,42 +2244,67 @@ fileprivate struct OverviewStoryView: View {
         mode == .resident ? residentCards : expertCards
     }
 
+    // In resident mode the headline metrics are shown visually by
+    // ResidentBudgetSnapshot, so the prose cards drop to the two that add
+    // context a chart can't: what to ask, and what a balanced 2027 needs.
+    private var residentFollowUpCards: [OverviewStoryCard] {
+        residentCards.filter { $0.tag == "Hearing" || $0.tag == "2027" }
+    }
+
+    @ViewBuilder
+    private func storyRow(_ card: OverviewStoryCard, isLast: Bool) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: card.symbol)
+                .font(.title3)
+                .foregroundStyle(RiverheadTheme.accent)
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(card.title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(RiverheadTheme.textPrimary)
+                    Spacer()
+                    Text(card.tag.uppercased())
+                        .font(.caption2.weight(.bold))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(RiverheadTheme.Surface.card.opacity(0.9))
+                        .clipShape(Capsule())
+                }
+                Text(card.blurb)
+                    .font(.footnote)
+                    .foregroundStyle(RiverheadTheme.textSecondary)
+            }
+        }
+
+        if !isLast {
+            Divider().opacity(0.2)
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            GlassCard(
-                title: "Budget story at a glance",
-                subtitle: mode == .resident
-                    ? "A few quick cards that walk you through the big questions, in plain language."
-                    : "Key fiscal metrics for the 2026 Tentative Budget. Tap a section chip above to drill deeper."
-            ) {
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(cards) { card in
-                        HStack(alignment: .top, spacing: 10) {
-                            Image(systemName: card.symbol)
-                                .font(.title3)
-                                .foregroundStyle(RiverheadTheme.accent)
+            if mode == .resident {
+                ResidentBudgetSnapshot()
 
-                            VStack(alignment: .leading, spacing: 4) {
-                                HStack {
-                                    Text(card.title)
-                                        .font(.subheadline.weight(.semibold))
-                                        .foregroundStyle(RiverheadTheme.textPrimary)
-                                    Spacer()
-                                    Text(card.tag.uppercased())
-                                        .font(.caption2.weight(.bold))
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(RiverheadTheme.Surface.card.opacity(0.9))
-                                        .clipShape(Capsule())
-                                }
-                                Text(card.blurb)
-                                    .font(.footnote)
-                                    .foregroundStyle(RiverheadTheme.textSecondary)
-                            }
+                GlassCard(
+                    title: "Before tonight's hearing",
+                    subtitle: "Two things worth knowing that the numbers above don't say on their own."
+                ) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(residentFollowUpCards) { card in
+                            storyRow(card, isLast: card.id == residentFollowUpCards.last?.id)
                         }
-
-                        if card.id != cards.last?.id {
-                            Divider().opacity(0.2)
+                    }
+                }
+            } else {
+                GlassCard(
+                    title: "Budget story at a glance",
+                    subtitle: "Key fiscal metrics for the 2026 Tentative Budget. Tap a section chip above to drill deeper."
+                ) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(cards) { card in
+                            storyRow(card, isLast: card.id == cards.last?.id)
                         }
                     }
                 }
