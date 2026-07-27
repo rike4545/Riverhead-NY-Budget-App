@@ -45,6 +45,18 @@ enum CommunityPreservationFundData {
     static let debtRateLow = 0.04
     static let debtRateHigh = 0.05
 
+    // Adopted July 7, 2026 (Resolution 2026-642, "Budget Adjustment to Pay Down
+    // 2018 Series B Bond Refunding," unanimous) — settles the remaining CPF
+    // preservation debt about five years early. Figures per RiverheadLOCAL.
+    static let payoffAdoptedDate = "July 7, 2026"
+    static let payoffResolution = "2026-642"
+    static let payoffCpfFundBalanceUsed = 7_200_000.00
+    static let payoffGeneralFundShare = 92_000.00
+    static let payoffYearsEarly = 5
+    static let payoffInterestSaved = 660_000.00
+    static let payoffFundBalanceEnd2025 = 30_100_000.00
+    static let payoffProjectedAfter = 20_100_000.00
+
     static let ratePercent = 0.02
     static let unimprovedThreshold = 75_000.00
     static let improvedThreshold = 150_000.00
@@ -113,6 +125,7 @@ struct CommunityPreservationFundView: View {
                     introCard
                     revenueHistoryCard
                     debtCard
+                    debtPayoffCard
                     framingCard
                     sourcesFooter
                 }
@@ -225,6 +238,42 @@ struct CommunityPreservationFundView: View {
                 }
                 .font(.caption)
                 .foregroundStyle(RiverheadTheme.textSecondary)
+            }
+        }
+    }
+
+    private var debtPayoffCard: some View {
+        GlassCard(title: "Adopted: paying off the preservation debt ~5 years early") {
+            VStack(alignment: .leading, spacing: 8) {
+                Label("Adopted \(CommunityPreservationFundData.payoffAdoptedDate) · Res. \(CommunityPreservationFundData.payoffResolution) · unanimous", systemImage: "checkmark.seal.fill")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(RiverheadTheme.brandMint)
+
+                Text("On \(CommunityPreservationFundData.payoffAdoptedDate) the Town Board voted unanimously (Resolution \(CommunityPreservationFundData.payoffResolution), \u{201C}Budget Adjustment to Pay Down 2018 Series B Bond Refunding\u{201D}) to settle the remaining CPF preservation debt about \(CommunityPreservationFundData.payoffYearsEarly) years early, using \(currencyText(CommunityPreservationFundData.payoffCpfFundBalanceUsed)) of CPF fund balance plus about \(currencyText(CommunityPreservationFundData.payoffGeneralFundShare)) from the general fund.")
+                    .font(.footnote)
+                    .foregroundStyle(RiverheadTheme.textPrimary)
+
+                HStack {
+                    Text("Estimated interest saved")
+                    Spacer()
+                    Text("~\(currencyText(CommunityPreservationFundData.payoffInterestSaved))")
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.green)
+                }
+                .font(.footnote)
+
+                HStack {
+                    Text("CPF balance: end 2025 \u{2192} after paydown")
+                    Spacer()
+                    Text("\(currencyText(CommunityPreservationFundData.payoffFundBalanceEnd2025)) \u{2192} ~\(currencyText(CommunityPreservationFundData.payoffProjectedAfter))")
+                        .fontWeight(.semibold)
+                }
+                .font(.caption)
+                .foregroundStyle(RiverheadTheme.textSecondary)
+
+                Text("Trades a one-time cash use for lower long-run debt service. Figures reported by RiverheadLOCAL; the vote is in the Town Board record.")
+                    .font(.caption2)
+                    .foregroundStyle(RiverheadTheme.textSecondary)
             }
         }
     }
