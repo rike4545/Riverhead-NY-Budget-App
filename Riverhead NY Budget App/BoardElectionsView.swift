@@ -22,6 +22,29 @@ struct BoardElectionMember: Identifiable {
     let result: String
 }
 
+struct ElectionCandidate: Identifiable {
+    let id = UUID()
+    let name: String
+    let party: String
+    let votes: Int
+    let won: Bool
+}
+
+struct ElectionRace: Identifiable {
+    let id = UUID()
+    let office: String
+    let seats: Int
+    let note: String?
+    let candidates: [ElectionCandidate]   // winners first, then runners-up
+}
+
+struct PriorElection: Identifiable {
+    let id = UUID()
+    let year: Int
+    let turnoutNote: String
+    let races: [ElectionRace]
+}
+
 enum BoardElectionsData {
     static let population = 35_902
     static let registeredVoters = 24_217
@@ -46,7 +69,48 @@ enum BoardElectionsData {
 
     static let note = "Vote counts are the winning candidate's own total, from the Suffolk County Board of Elections' final certified results (including the 2025 supervisor recount). The registered-voter denominator is the November 2025 figure; the 2023 winners are compared against it as an approximate reference. Percentages are the winner's votes divided by each denominator — not a turnout rate."
 
-    static let sources = "RiverheadLOCAL / Riverhead News-Review 2025 and 2023 election results · Suffolk County Board of Elections, Election Results · U.S. Census Bureau, 2020 Census — Town of Riverhead."
+    static let sources = "RiverheadLOCAL / Riverhead News-Review 2025 and 2023 election results · Suffolk County Board of Elections, Election Results (incl. 2019/2021/2025 general-election Riverhead town pages) · U.S. Census Bureau, 2020 Census — Town of Riverhead."
+
+    static let priorElectionsNote = "Prior Riverhead town general-election results from the Suffolk County Board of Elections. Totals combine each candidate's party lines (e.g. Republican + Conservative). Turnout stayed near 39% in 2019 and 2021 and fell to about 32% in 2025 — the same low-participation pattern that decides who controls the Town's budget."
+
+    static let priorElections: [PriorElection] = [
+        .init(year: 2025, turnoutNote: "7,879 of 24,429 voted for supervisor (32.3%).", races: [
+            .init(office: "Supervisor", seats: 1, note: "Jerry Halpin flipped the seat for the Democrats by 37 votes, confirmed on a full manual recount.", candidates: [
+                .init(name: "Jerome (Jerry) Halpin", party: "D/TF", votes: 3_958, won: true),
+                .init(name: "Timothy C. Hubbard", party: "R/C", votes: 3_921, won: false),
+            ]),
+            .init(office: "Council member", seats: 2, note: nil, candidates: [
+                .init(name: "Bob Kern", party: "R/C", votes: 3_958, won: true),
+                .init(name: "Kenneth Rothwell", party: "R/C", votes: 3_882, won: true),
+                .init(name: "Mark A. Woolley", party: "D/TF", votes: 3_824, won: false),
+                .init(name: "Kevin M. Shea", party: "D/TF", votes: 3_515, won: false),
+            ]),
+        ]),
+        .init(year: 2021, turnoutNote: "9,142 of 23,133 voted for supervisor (39.5%).", races: [
+            .init(office: "Supervisor", seats: 1, note: nil, candidates: [
+                .init(name: "Yvette Aguiar", party: "R/C", votes: 5_335, won: true),
+                .init(name: "Catherine Kent", party: "D/WF", votes: 3_807, won: false),
+            ]),
+            .init(office: "Councilman", seats: 2, note: "Current members Kenneth Rothwell and Robert Kern first won their council seats here.", candidates: [
+                .init(name: "Kenneth Rothwell", party: "R/C", votes: 5_453, won: true),
+                .init(name: "Robert Kern", party: "R/C", votes: 5_206, won: true),
+                .init(name: "Evelyn Hobson-Womack", party: "D/WF", votes: 3_760, won: false),
+                .init(name: "Juan Micieli-Martinez", party: "D/WF", votes: 3_137, won: false),
+            ]),
+        ]),
+        .init(year: 2019, turnoutNote: "8,587 of 21,798 voted for supervisor (39.4%).", races: [
+            .init(office: "Supervisor", seats: 1, note: nil, candidates: [
+                .init(name: "Yvette Aguiar", party: "R/C", votes: 4_647, won: true),
+                .init(name: "Laura M. Jens-Smith", party: "D/WF/I", votes: 3_940, won: false),
+            ]),
+            .init(office: "Councilman", seats: 2, note: "Timothy Hubbard — later supervisor, defeated in 2025 — first won a council seat here.", candidates: [
+                .init(name: "Timothy C. Hubbard", party: "R/C", votes: 4_924, won: true),
+                .init(name: "Frank R. Beyrodt Jr.", party: "R/C", votes: 4_564, won: true),
+                .init(name: "Diane E. Tucci", party: "D", votes: 3_634, won: false),
+                .init(name: "Patricia A. Snyder", party: "D", votes: 3_130, won: false),
+            ]),
+        ]),
+    ]
 }
 
 struct BoardElectionsView: View {
@@ -131,7 +195,21 @@ struct BoardElectionsView: View {
                 }
             }
 
+            ForEach(BoardElectionsData.priorElections) { election in
+                Section("\(yearText(election.year)) General Election") {
+                    Text(election.turnoutNote)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    ForEach(election.races) { race in
+                        raceView(race)
+                    }
+                }
+            }
+
             Section {
+                Text(BoardElectionsData.priorElectionsNote)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
                 Text(BoardElectionsData.note)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
@@ -150,5 +228,57 @@ struct BoardElectionsView: View {
             Text(value).font(.title3.weight(.bold)).foregroundStyle(RiverheadTheme.brandNavy)
             Text(sub).font(.caption2).foregroundStyle(.secondary)
         }
+    }
+
+    // Plain year string — avoids the locale grouping that renders 2,025.
+    private func yearText(_ year: Int) -> String { String(year) }
+
+    @ViewBuilder
+    private func raceView(_ race: ElectionRace) -> some View {
+        let maxVotes = race.candidates.map(\.votes).max() ?? 1
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(race.office)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(RiverheadTheme.brandNavy)
+                Spacer()
+                Text(race.seats == 1 ? "1 seat" : "\(race.seats) seats")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            if let note = race.note {
+                Text(note)
+                    .font(.caption2)
+                    .foregroundStyle(RiverheadTheme.accent)
+            }
+            ForEach(race.candidates) { c in
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(alignment: .firstTextBaseline) {
+                        Text("\(c.won ? "✓ " : "")\(c.name)")
+                            .font(.caption.weight(c.won ? .bold : .regular))
+                            .foregroundStyle(c.won ? RiverheadTheme.brandNavy : RiverheadTheme.textSecondary)
+                        Text("(\(c.party))")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Text(c.votes.formatted())
+                            .font(.caption.weight(c.won ? .bold : .regular))
+                            .foregroundStyle(c.won ? RiverheadTheme.brandNavy : RiverheadTheme.textSecondary)
+                    }
+                    GeometryReader { geo in
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(RiverheadTheme.Surface.card)
+                            .frame(height: 6)
+                            .overlay(alignment: .leading) {
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(c.won ? RiverheadTheme.accent : RiverheadTheme.textSecondary.opacity(0.4))
+                                    .frame(width: geo.size.width * (Double(c.votes) / Double(maxVotes)), height: 6)
+                            }
+                    }
+                    .frame(height: 6)
+                }
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
