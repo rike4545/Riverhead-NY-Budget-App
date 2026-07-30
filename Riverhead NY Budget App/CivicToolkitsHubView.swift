@@ -139,6 +139,13 @@ struct CivicToolkitsHubView: View {
                 ) { CandidateWatchView() }
 
                 toolRow(
+                    title: "Candidate Proposals: Cost & Benefit",
+                    subtitle: "An even-handed cost–benefit look at every plank — plus a non-partisan fiscal view of the Town's repeated tax increases.",
+                    symbol: "scalemass",
+                    tint: RiverheadTheme.brandTeal
+                ) { CandidateCostBenefitView() }
+
+                toolRow(
                     title: "How the Board Was Elected",
                     subtitle: "Each member's actual winning vote count vs. the town's population and registered voters.",
                     symbol: "chart.bar.doc.horizontal",

@@ -150,6 +150,18 @@ struct Budget2027SpendingReductionView: View {
     }
     private var gapCoverage: Double { min(rawGapCoverage, 1.0) }
 
+    // The real binding constraint: the cap-piercing gap, and the honest math
+    // that closes it with only firm items + the unanimous buyout.
+    private var capGap: Double { CloseTheGap2027.capPiercingGap }
+    private var firmSupplementTotal: Double {
+        supplementItems.filter { $0.confidence == "firm" }.reduce(0) { $0 + $1.amount }
+    }
+    private var firmRecurringTotal: Double {
+        personnelPolicyFullTotal + operationalFullTotal + firmSupplementTotal
+    }
+    private var comboLowPct: Double { (CloseTheGap2027.RetirementIncentive.projectedSavingsLow + firmRecurringTotal) / capGap }
+    private var comboHighPct: Double { (CloseTheGap2027.RetirementIncentive.projectedSavingsHigh + firmRecurringTotal) / capGap }
+
     var body: some View {
         List {
             Section {
@@ -199,6 +211,9 @@ struct Budget2027SpendingReductionView: View {
                 .font(.subheadline)
             }
 
+            capGapSection
+            retirementLeverSection
+
             Section {
                 Text("Union wage growth ($907.9K of modeled PBA/SOA/CSEA pressure) is the single largest driver in the 2027 model, but it's contractually locked and cannot be treated as a spending-reduction lever without a successor labor agreement — it stays on the pressure side of the budget, not here. Every dollar below is traceable to either a named formula input or an actual 2025→2026 account-level change in the Town's own 2026 Budget Supplement. Tap any item to test a package that leaves it out.")
                     .font(.footnote)
@@ -242,9 +257,134 @@ struct Budget2027SpendingReductionView: View {
                     Text("Every controllable, non-mandated line the 2026 Budget Supplement budgets more than 30% above its own trailing actuals — trimmed back to that run-rate. Tagged FIRM (operating/professional services), MODERATE (capital/maintenance that fluctuates), or VOLATILE (price-driven fuel and energy). Mandated costs — pension, workers' comp, insurance, debt service — are excluded, since their growth is obligation, not waste.")
                 }
             }
+
+            splitBoardSection
         }
         .navigationTitle("2027 Spending Reduction")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    // MARK: - The real cap gap, and the path through a split board
+
+    @ViewBuilder private var capGapSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Two different “gaps” — and which one actually binds")
+                    .font(.headline)
+                Text("The payroll-pressure gap above (\(payrollPressureGap, format: .currency(code: "USD").precision(.fractionLength(0)))) is the recurring cost of standing still. The number that actually forces a decision is bigger: the projected 2027 levy overshoots New York's 2% property-tax cap by about \(capGap, format: .currency(code: "USD").precision(.fractionLength(0))) (a ~\(Int(CloseTheGap2027.predictedLevyPct))% levy against a ~\(Int(CloseTheGap2027.capBasePct))% ceiling). That is the real overage to resolve.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Divider()
+
+                Text("Closing it without piercing the cap")
+                    .font(.subheadline.weight(.semibold))
+                Text("The unanimous retirement incentive plus only the firmest line trims — nothing volatile, no fund-balance raid, no override — already sum to roughly the whole gap:")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                gapTile("Retirement incentive", "\(CloseTheGap2027.RetirementIncentive.projectedSavingsLow.formatted(.currency(code: "USD").precision(.fractionLength(0))))–\(CloseTheGap2027.RetirementIncentive.projectedSavingsHigh.formatted(.currency(code: "USD").precision(.fractionLength(0))))", "Town projection · adopted 5–0", RiverheadTheme.brandMint)
+                gapTile("Firm-confidence trims", firmRecurringTotal.formatted(.currency(code: "USD").precision(.fractionLength(0))), "Excludes volatile & capital-timing items", RiverheadTheme.brandSky)
+                gapTile("Combined vs. the cap gap", "\(comboLowPct.formatted(.percent.precision(.fractionLength(0))))–\(comboHighPct.formatted(.percent.precision(.fractionLength(0))))", "of the \(capGap.formatted(.currency(code: "USD").precision(.fractionLength(0)))) overage", RiverheadTheme.brandNavy)
+            }
+            .padding(.vertical, 4)
+        } header: {
+            Text("The real constraint")
+        }
+    }
+
+    @ViewBuilder private var retirementLeverSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("The Town Board unanimously approved three voluntary retirement incentives on July 7, 2026 (\(CloseTheGap2027.RetirementIncentive.resolutions)). The Town projects \(CloseTheGap2027.RetirementIncentive.projectedSavingsLow, format: .currency(code: "USD").precision(.fractionLength(0)))–\(CloseTheGap2027.RetirementIncentive.projectedSavingsHigh, format: .currency(code: "USD").precision(.fractionLength(0))) in savings over \(CloseTheGap2027.RetirementIncentive.savingsWindow).")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                ForEach(CloseTheGap2027.RetirementIncentive.eligible) { u in
+                    HStack(alignment: .firstTextBaseline) {
+                        Text("\(u.unit) · \(u.count) eligible")
+                            .font(.caption.weight(.semibold))
+                        Spacer(minLength: 8)
+                        Text(u.benefit)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.trailing)
+                    }
+                }
+                Text(CloseTheGap2027.RetirementIncentive.note)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.vertical, 4)
+        } header: {
+            Text("Retirement incentive · \(CloseTheGap2027.RetirementIncentive.eligibleTotal) eligible")
+        }
+    }
+
+    @ViewBuilder private var splitBoardSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Closing the gap has to pass a divided board: a Democratic Supervisor with a four-member Republican Council majority. Under NY Town Law the Supervisor prepares the tentative budget and the Council adopts it, so a durable plan needs both. These levers are ordered by how well each survives that split — least partisan first.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                ForEach(Array(CloseTheGap2027.paths.enumerated()), id: \.element.id) { idx, p in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(alignment: .firstTextBaseline, spacing: 8) {
+                            Text("\(idx + 1)").font(.caption.weight(.black)).foregroundStyle(.secondary)
+                            Text(p.name).font(.subheadline.weight(.semibold))
+                            Spacer(minLength: 6)
+                        }
+                        Text(p.standing.rawValue)
+                            .font(.caption2.weight(.bold))
+                            .padding(.horizontal, 8).padding(.vertical, 2)
+                            .background(standingTint(p.standing).opacity(0.16), in: Capsule())
+                            .foregroundStyle(standingTint(p.standing))
+                        Text("Closes: \(p.closes)").font(.caption.weight(.semibold)).foregroundStyle(RiverheadTheme.brandMint)
+                        Text(p.politics).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.vertical, 4)
+                }
+                Text(CloseTheGap2027.pragmaticReading)
+                    .font(.footnote)
+                    .foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 2)
+            }
+            .padding(.vertical, 4)
+        } header: {
+            Text("The best way forward through a split board")
+        } footer: {
+            Text("Board composition from the November 2025 results; budget roles per NY Town Law §§104–106. Cap-override mechanics per General Municipal Law §3-c (a 60% vote of the governing body).")
+        }
+    }
+
+    private func gapTile(_ label: String, _ value: String, _ note: String, _ tint: Color) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                Text(note).font(.caption2).foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 8)
+            Text(value).font(.headline.weight(.bold)).foregroundStyle(tint)
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(tint.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
+    private func standingTint(_ s: CloseTheGap2027.Standing) -> Color {
+        switch s {
+        case .agreed, .lowFriction: return RiverheadTheme.brandMint
+        case .neutral: return RiverheadTheme.brandSky
+        case .oneTime: return RiverheadTheme.brandGold
+        case .deliberate: return RiverheadTheme.brandNavy
+        case .blunt: return RiverheadTheme.brandCoral
+        }
     }
 
     private var coverageBar: some View {
