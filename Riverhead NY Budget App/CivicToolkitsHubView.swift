@@ -146,6 +146,13 @@ struct CivicToolkitsHubView: View {
                 ) { BoardElectionsView() }
 
                 toolRow(
+                    title: "Town Board Votes",
+                    subtitle: "Every meeting, resolution, and roll-call vote from the Town's own minutes — plus what's coming up next.",
+                    symbol: "checklist.checked",
+                    tint: RiverheadTheme.brandTeal
+                ) { TownBoardVotesView() }
+
+                toolRow(
                     title: "Procurement Watch",
                     subtitle: "When contracts skip normal competitive bidding — sole-source exceptions and the Petrocelli Town Square deal.",
                     symbol: "doc.text.magnifyingglass",
