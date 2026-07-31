@@ -164,6 +164,11 @@ struct Budget2027SpendingReductionView: View {
 
     var body: some View {
         List {
+            // Answer first: the real cap gap and the plan that closes it.
+            capGapSection
+            retirementLeverSection
+
+            // Then the interactive tool to explore/build the package.
             Section {
                 VStack(alignment: .leading, spacing: 10) {
                     Text(grandSelectedTotal, format: .currency(code: "USD"))
@@ -209,21 +214,26 @@ struct Budget2027SpendingReductionView: View {
                     .buttonStyle(.bordered)
                 }
                 .font(.subheadline)
+            } header: {
+                Text("Build your own package")
+            } footer: {
+                Text("Toggle any item to test a package that leaves it out. Totals update live against the payroll-pressure gap.")
             }
 
-            capGapSection
-            retirementLeverSection
-
             Section {
-                Text("Union wage growth ($907.9K of modeled PBA/SOA/CSEA pressure) is the single largest driver in the 2027 model, but it's contractually locked and cannot be treated as a spending-reduction lever without a successor labor agreement — it stays on the pressure side of the budget, not here. Every dollar below is traceable to either a named formula input or an actual 2025→2026 account-level change in the Town's own 2026 Budget Supplement. Tap any item to test a package that leaves it out.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                DisclosureGroup("About this package & scope") {
+                    Text("Union wage growth ($907.9K of modeled PBA/SOA/CSEA pressure) is the single largest driver in the 2027 model, but it's contractually locked and cannot be treated as a spending-reduction lever without a successor labor agreement — it stays on the pressure side of the budget, not here. Every dollar below is traceable to either a named formula input or an actual 2025→2026 account-level change in the Town's own 2026 Budget Supplement.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .padding(.vertical, 4)
 
-                Text("PBA and SOA contracts both expire 12/31/2026 (CSEA is already locked through a ratified 2026-2029 agreement). New York law routes police/fire bargaining impasses to binding arbitration rather than legislative resolution, and comparable Long Island police contracts have taken 1-3+ years past expiration to settle — so the PBA/SOA figures above will likely remain placeholder estimates through the 2027 budget cycle, with any successor terms applied retroactively once reached.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            } header: {
-                Text("Scope")
+                    Text("PBA and SOA contracts both expire 12/31/2026 (CSEA is already locked through a ratified 2026-2029 agreement). New York law routes police/fire bargaining impasses to binding arbitration rather than legislative resolution, and comparable Long Island police contracts have taken 1-3+ years past expiration to settle — so the PBA/SOA figures above will likely remain placeholder estimates through the 2027 budget cycle, with any successor terms applied retroactively once reached.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .padding(.vertical, 4)
+                }
+                .font(.subheadline.weight(.semibold))
+                .tint(RiverheadTheme.brandNavy)
             }
 
             Section {
@@ -271,7 +281,7 @@ struct Budget2027SpendingReductionView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Two different “gaps” — and which one actually binds")
                     .font(.headline)
-                Text("The payroll-pressure gap above (\(payrollPressureGap, format: .currency(code: "USD").precision(.fractionLength(0)))) is the recurring cost of standing still. The number that actually forces a decision is bigger: the projected 2027 levy overshoots New York's 2% property-tax cap by about \(capGap, format: .currency(code: "USD").precision(.fractionLength(0))) (a ~\(Int(CloseTheGap2027.predictedLevyPct))% levy against a ~\(Int(CloseTheGap2027.capBasePct))% ceiling). That is the real overage to resolve.")
+                Text("There are two numbers. The payroll-pressure gap (\(payrollPressureGap, format: .currency(code: "USD").precision(.fractionLength(0)))) is the recurring cost of standing still. The one that actually forces a decision is bigger: the projected 2027 levy overshoots New York's 2% property-tax cap by about \(capGap, format: .currency(code: "USD").precision(.fractionLength(0))) (a ~\(Int(CloseTheGap2027.predictedLevyPct))% levy against a ~\(Int(CloseTheGap2027.capBasePct))% ceiling). That is the real overage to resolve.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -326,39 +336,42 @@ struct Budget2027SpendingReductionView: View {
 
     @ViewBuilder private var splitBoardSection: some View {
         Section {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Closing the gap has to pass a divided board: a Democratic Supervisor with a four-member Republican Council majority. Under NY Town Law the Supervisor prepares the tentative budget and the Council adopts it, so a durable plan needs both. These levers are ordered by how well each survives that split — least partisan first.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                ForEach(Array(CloseTheGap2027.paths.enumerated()), id: \.element.id) { idx, p in
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(alignment: .firstTextBaseline, spacing: 8) {
-                            Text("\(idx + 1)").font(.caption.weight(.black)).foregroundStyle(.secondary)
-                            Text(p.name).font(.subheadline.weight(.semibold))
-                            Spacer(minLength: 6)
+            DisclosureGroup("Will it pass a divided board? The politics") {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Closing the gap has to pass a divided board: a Democratic Supervisor with a four-member Republican Council majority. Under NY Town Law the Supervisor prepares the tentative budget and the Council adopts it, so a durable plan needs both. These levers are ordered by how well each survives that split — least partisan first.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    ForEach(Array(CloseTheGap2027.paths.enumerated()), id: \.element.id) { idx, p in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                                Text("\(idx + 1)").font(.caption.weight(.black)).foregroundStyle(.secondary)
+                                Text(p.name).font(.subheadline.weight(.semibold))
+                                Spacer(minLength: 6)
+                            }
+                            Text(p.standing.rawValue)
+                                .font(.caption2.weight(.bold))
+                                .padding(.horizontal, 8).padding(.vertical, 2)
+                                .background(standingTint(p.standing).opacity(0.16), in: Capsule())
+                                .foregroundStyle(standingTint(p.standing))
+                            Text("Closes: \(p.closes)").font(.caption.weight(.semibold)).foregroundStyle(RiverheadTheme.brandMint)
+                            Text(p.politics).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                         }
-                        Text(p.standing.rawValue)
-                            .font(.caption2.weight(.bold))
-                            .padding(.horizontal, 8).padding(.vertical, 2)
-                            .background(standingTint(p.standing).opacity(0.16), in: Capsule())
-                            .foregroundStyle(standingTint(p.standing))
-                        Text("Closes: \(p.closes)").font(.caption.weight(.semibold)).foregroundStyle(RiverheadTheme.brandMint)
-                        Text(p.politics).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
+                    Text(CloseTheGap2027.pragmaticReading)
+                        .font(.footnote)
+                        .foregroundStyle(.primary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, 2)
+                    Text("Board composition from the November 2025 results; budget roles per NY Town Law §§104–106. Cap-override mechanics per General Municipal Law §3-c (a 60% vote of the governing body).")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                 }
-                Text(CloseTheGap2027.pragmaticReading)
-                    .font(.footnote)
-                    .foregroundStyle(.primary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.top, 2)
+                .padding(.vertical, 4)
             }
-            .padding(.vertical, 4)
-        } header: {
-            Text("The best way forward through a split board")
-        } footer: {
-            Text("Board composition from the November 2025 results; budget roles per NY Town Law §§104–106. Cap-override mechanics per General Municipal Law §3-c (a 60% vote of the governing body).")
+            .font(.subheadline.weight(.semibold))
+            .tint(RiverheadTheme.brandNavy)
         }
     }
 
@@ -400,7 +413,7 @@ struct Budget2027SpendingReductionView: View {
             }
             .frame(height: 8)
 
-            Text("\(rawGapCoverage.formatted(.percent.precision(.fractionLength(0)))) of the \(payrollPressureGap, format: .currency(code: "USD").precision(.fractionLength(0))) modeled 2027 payroll-pressure gap\(rawGapCoverage >= 1 ? " — fully covered" : "") — the smaller of the two gaps; the ~$2.62M cap-piercing gap below is the one that actually binds.")
+            Text("\(rawGapCoverage.formatted(.percent.precision(.fractionLength(0)))) of the \(payrollPressureGap, format: .currency(code: "USD").precision(.fractionLength(0))) modeled 2027 payroll-pressure gap\(rawGapCoverage >= 1 ? " — fully covered" : "") — the smaller of the two gaps; the ~$2.62M cap-piercing gap above is the one that actually binds.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
