@@ -30,7 +30,7 @@ enum CandidateWatchData {
         ("Filing Deadline (Major Parties)", "April 6, 2026"),
         ("Filing Deadline (Independents)", "June 15, 2026"),
         ("Filing Deadline (Other Parties)", "July 2026"),
-        ("Primary", "June 23, 2026"),
+        ("Primary (held)", "June 23, 2026"),
         ("General Election", "November 3, 2026"),
     ]
 

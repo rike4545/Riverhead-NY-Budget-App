@@ -400,7 +400,7 @@ struct Budget2027SpendingReductionView: View {
             }
             .frame(height: 8)
 
-            Text("\(rawGapCoverage.formatted(.percent.precision(.fractionLength(0)))) of the \(payrollPressureGap, format: .currency(code: "USD").precision(.fractionLength(0))) modeled 2027 payroll-pressure gap\(rawGapCoverage >= 1 ? " — fully covered" : "")")
+            Text("\(rawGapCoverage.formatted(.percent.precision(.fractionLength(0)))) of the \(payrollPressureGap, format: .currency(code: "USD").precision(.fractionLength(0))) modeled 2027 payroll-pressure gap\(rawGapCoverage >= 1 ? " — fully covered" : "") — the smaller of the two gaps; the ~$2.62M cap-piercing gap below is the one that actually binds.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
