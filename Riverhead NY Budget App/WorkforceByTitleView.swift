@@ -17,18 +17,34 @@ private struct Wage: Decodable {
     let hrMax: Double?
     let annMin: Int?
     let annMax: Int?
+    // Present only where the resolution prints an annual salary and leaves the
+    // hourly column blank: the annual bracketed between the two CSEA workweeks.
+    let hrBasisLow: Int?
+    let hrBasisHigh: Int?
+    let hrDerivedMin: Double?
+    let hrDerivedMax: Double?
+
+    private static func hrText(_ lo: Double, _ hi: Double) -> String {
+        lo == hi ? String(format: "$%.4f/hr", lo)
+                 : String(format: "$%.4f–$%.4f/hr", lo, hi)
+    }
 
     var line: String {
         var parts: [String] = []
-        if let lo = hrMin, let hi = hrMax {
-            parts.append(lo == hi ? String(format: "$%.4f/hr", lo)
-                                  : String(format: "$%.4f–$%.4f/hr", lo, hi))
-        }
+        if let lo = hrMin, let hi = hrMax { parts.append(Wage.hrText(lo, hi)) }
         if let lo = annMin, let hi = annMax {
             parts.append(lo == hi ? "$\(lo.formatted())/yr"
                                   : "$\(lo.formatted())–$\(hi.formatted())/yr")
         }
         return parts.isEmpty ? "" : "2026 authorized rate · " + parts.joined(separator: " · ")
+    }
+
+    /// The computed hourly bracket for titles the Town publishes only an annual
+    /// salary for — deliberately kept out of `line` so it never reads as a rate
+    /// the Board authorized.
+    var derivedLine: String {
+        guard hrMin == nil, let lo = hrDerivedMin, let hi = hrDerivedMax else { return "" }
+        return String(format: "≈ $%.4f/hr on a 40-hour week to $%.4f/hr on a 35-hour week — computed by this app, not a published rate", lo, hi)
     }
 }
 
@@ -118,7 +134,10 @@ struct WorkforceByTitleView: View {
             } header: {
                 Text("\(rows.count) of \(file?.titles.count ?? 0) titles")
             } footer: {
-                if let note = file?.note { Text(note) }
+                VStack(alignment: .leading, spacing: 8) {
+                    if let note = file?.note { Text(note) }
+                    Text("The teal line is what the Board's January 2026 salary resolutions actually print. Those rosters have an ANNUAL SALARY column and an HOURLY column, but the Town fills the hourly one in only for part-time staff and for the Water District — the one department that publishes both. For every other full-time title no hourly rate is published, so the grey ≈ line brackets it: the annual over 2,088 hours (a 40-hour week) to over 1,827 hours (a 35-hour week). Those are the two regular workweeks in the CSEA agreement on Riverhead's 261-workday year, and all 16 of the Water District's published rates land on exactly one or the other. The rosters don't say which workweek each title is on — that's why it's a range, and why it's arithmetic by this app rather than a rate the Board voted on. No hourly figure at all is shown for elected officials, board members (paid a stipend, not a wage) or sworn police, whose contract workweek these resolutions don't state.")
+                }
             }
         }
         .listStyle(.insetGrouped)
@@ -159,6 +178,12 @@ private struct TitleRowView: View {
                 Text(w.line)
                     .font(.caption.weight(.medium))
                     .foregroundStyle(RiverheadTheme.brandTeal)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            if let w = row.wage2026, !w.derivedLine.isEmpty {
+                Text(w.derivedLine)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
