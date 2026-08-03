@@ -93,7 +93,7 @@ enum CloseTheGap2027 {
             name: "Use a modest, disclosed one-time fund-balance appropriation for the residual only",
             closes: "whatever gap remains after the recurring measures above",
             standing: .oneTime,
-            politics: "An easy vote — it raises no tax and cuts no service — but it spends one-time money on recurring cost, so it can only bridge a transitional remainder. Appropriating the full $2.62M would burn ~7.8% of the General Fund cushion for something that recurs."
+            politics: "An easy vote — it raises no tax and cuts no service — but it spends one-time money on recurring cost, so it can only bridge a transitional remainder. Appropriating the full $2.62M would burn ~8.8% of the $29.7M unassigned fund balance — the truly flexible cushion — for something that recurs."
         ),
         .init(
             name: "If the Board still wants the spending, override the cap — deliberately and in public",

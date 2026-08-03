@@ -68,7 +68,7 @@ private enum CandidateCBData {
                 CBPlank(
                     proposal: "Build a stable budget that doesn't over-tax young families and seniors.",
                     benefit: "Frames the goal as recurring balance rather than one-time patches — the fiscally honest target, consistent with staying under the tax cap year over year.",
-                    cost: "“Stable” is an outcome, not a mechanism: it still needs either the trims or the new revenue. If neither fully lands, the only lever left is the $33.4M fund balance — one-time money that can't fund a recurring gap twice.",
+                    cost: "“Stable” is an outcome, not a mechanism: it still needs either the trims or the new revenue. If neither fully lands, the only lever left is fund balance — $29.7M of the $33.4M General Fund balance is unassigned and actually flexible — and that is one-time money that can't fund a recurring gap twice.",
                     tradeoff: "Protecting specific groups from tax increases can mean shifting cost to fees or districts, which are less visible but land on the same households."
                 ),
             ],
@@ -83,7 +83,7 @@ private enum CandidateCBData {
             planks: [
                 CBPlank(
                     proposal: "Lower the cost of taxes — the campaign's stated top issue.",
-                    benefit: "Direct, immediately felt relief for every property owner, and the Town has a large cushion to work from: a ~$33.4M General Fund balance.",
+                    benefit: "Direct, immediately felt relief for every property owner, and the Town has a large cushion to work from: a $33.4M General Fund balance, of which $29.7M is unassigned and actually available.",
                     cost: "An actual levy cut (versus merely holding growth) widens the ~$2.62M cap gap rather than closing it — the reduction has to be found on top of the gap. Funding a cut from reserves spends one-time money on a recurring obligation.",
                     tradeoff: "The NY tax cap already caps levy growth at ~2%; the fiscal distance between “hold at the cap” and “actually lower” is large, and this plank must be squared with the new-spending planks below."
                 ),
@@ -137,7 +137,7 @@ private enum CandidateCBData {
     static let principles: [(String, String)] = [
         ("Fund recurring costs with recurring revenue", "The most common structural error is patching an operating gap with one-time money — appropriated fund balance, one-off sales. It balances this year and guarantees the same gap next year. A simple rule — reserves only for one-time or emergency needs — prevents the cliff."),
         ("Adopt a rolling multi-year forecast", "A 3–5 year projection of revenues, payroll, pension, and debt turns a surprise at adoption into a problem seen 18 months out, when small corrections still work."),
-        ("Set — and respect — a fund-balance target", "The ~$33.4M General Fund balance is a genuine strength; GFOA guidance is to hold at least ~two months of operating expenditures. That cushion is for emergencies and cash flow, not for buying down recurring costs."),
+        ("Set — and respect — a fund-balance target", "The $33.4M General Fund balance — $29.7M of it unassigned — is a genuine strength; GFOA guidance is to hold at least ~two months of operating expenditures. That cushion is for emergencies and cash flow, not for buying down recurring costs."),
         ("Treat a cap override as an exception, decided in the open", "A deliberate override local law, adopted in public with the 60% vote on the record and a stated reason, is very different from backing into an increase. Overriding routinely is how the discipline erodes."),
         ("Go at the real cost drivers, with the data", "The 2026 retirement incentive, police-overtime normalization, and the audited line-item increases in the Budget Supplement are where the recurring dollars are. Prepare early and with comparables for the PBA/SOA arbitrations expiring 12/31/2026."),
         ("Diversify revenue honestly — but don't bank it early", "Economic development, cost-aligned fees, and grants are legitimate offsets. The discipline is timing: base growth is real but slow, so it belongs in the multi-year plan, not as a same-year plug."),

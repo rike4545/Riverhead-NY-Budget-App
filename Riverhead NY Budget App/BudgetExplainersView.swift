@@ -124,7 +124,7 @@ struct BudgetExplainersView: View {
                     .init(label: "Annual costs", systemImage: "calendar", tint: .red),
                     .init(label: "Next year gap", systemImage: "exclamationmark.triangle.fill", tint: .orange)
                 ],
-                whyItMatters: "A budget can look balanced now and still create a structural gap next year if one-time money is carrying recurring costs.",
+                whyItMatters: "A budget can look balanced now and still create a structural gap next year if one-time money is carrying recurring costs. Riverhead's $29.7M unassigned fund balance (of a $33.4M General Fund balance) could erase the entire 2027 cap gap on paper — but it is one-time money against a cost that returns every year, so it would buy one budget and leave the same hole behind.",
                 practicalQuestion: "Which part of this plan disappears after one year, and which costs still remain?"
             ),
             .init(
@@ -166,8 +166,8 @@ struct BudgetExplainersView: View {
                     .init(label: "Board vote", systemImage: "person.3.fill", tint: RiverheadTheme.brandSky),
                     .init(label: "Public reason", systemImage: "quote.bubble.fill", tint: RiverheadTheme.gold)
                 ],
-                whyItMatters: "The public question is not just whether an override happens. It is whether the Town shows a cap-compliant baseline, clear findings, and a path back to stability.",
-                practicalQuestion: "What would the budget look like under the cap, and what exactly does an override fund?"
+                whyItMatters: "The public question is not just whether an override happens. It is whether the Town shows a cap-compliant baseline, clear findings, and a path back to stability. Riverhead has adopted overrides in 2023, 2024, and 2026, and on current trends the 2027 levy pierces the cap by about $2.62M — so this is a live question, not a hypothetical.",
+                practicalQuestion: "What would the budget look like under the cap, and what exactly does an override fund? (The 2027 Spending Reduction deep dive below works this out line by line.)"
             ),
 
             // MARK: GASB Accounting
@@ -520,6 +520,44 @@ struct BudgetExplainersView: View {
             Text("Use these when a short explainer is not enough and you want a specific Riverhead case study or policy lens.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+
+            // The concepts above are abstract on purpose; these are the same
+            // ideas worked out in Riverhead's actual 2026–27 numbers.
+            NavigationLink {
+                Budget2027SpendingReductionView()
+            } label: {
+                deepDiveCard(
+                    title: "The 2027 Tax Cap Gap, Worked Out",
+                    subtitle: "“What would the budget look like under the cap?” — answered: the levy pierces it by about $2.62M, and here is what closes the gap without an override.",
+                    systemImage: "chart.line.downtrend.xyaxis",
+                    accent: RiverheadTheme.brandMint
+                )
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                TownBoardVotesView()
+            } label: {
+                deepDiveCard(
+                    title: "Town Board Votes",
+                    subtitle: "Every resolution and roll-call vote from the Town's own minutes — where the budget decisions above actually get made.",
+                    systemImage: "checklist.checked",
+                    accent: RiverheadTheme.brandTeal
+                )
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                WorkforceByTitleView()
+            } label: {
+                deepDiveCard(
+                    title: "Workforce by Title",
+                    subtitle: "Personnel is the largest recurring cost — see how many hold each job, the authorized rate, and which titles are growing.",
+                    systemImage: "person.3.sequence.fill",
+                    accent: RiverheadTheme.brandSky
+                )
+            }
+            .buttonStyle(.plain)
 
             NavigationLink {
                 SnowRemovalOverrunView()
