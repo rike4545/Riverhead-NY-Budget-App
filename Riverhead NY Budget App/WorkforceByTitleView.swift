@@ -21,6 +21,8 @@ private struct Wage: Decodable {
     // hourly column blank: the annual bracketed between the two CSEA workweeks.
     let hrBasisLow: Int?
     let hrBasisHigh: Int?
+    let hrLowLabel: String?
+    let hrHighLabel: String?
     let hrDerivedMin: Double?
     let hrDerivedMax: Double?
 
@@ -43,8 +45,10 @@ private struct Wage: Decodable {
     /// salary for — deliberately kept out of `line` so it never reads as a rate
     /// the Board authorized.
     var derivedLine: String {
-        guard hrMin == nil, let lo = hrDerivedMin, let hi = hrDerivedMax else { return "" }
-        return String(format: "≈ $%.4f/hr on a 40-hour week to $%.4f/hr on a 35-hour week — computed by this app, not a published rate", lo, hi)
+        guard hrMin == nil, let lo = hrDerivedMin, let hi = hrDerivedMax,
+              let loLabel = hrLowLabel, let hiLabel = hrHighLabel else { return "" }
+        return String(format: "≈ $%.4f/hr on %@ to $%.4f/hr on %@ — computed by this app, not a published rate",
+                      lo, loLabel, hi, hiLabel)
     }
 }
 
@@ -136,7 +140,7 @@ struct WorkforceByTitleView: View {
             } footer: {
                 VStack(alignment: .leading, spacing: 8) {
                     if let note = file?.note { Text(note) }
-                    Text("The teal line is what the Board's January 2026 salary resolutions actually print. Those rosters have an ANNUAL SALARY column and an HOURLY column, but the Town fills the hourly one in only for part-time staff and for the Water District — the one department that publishes both. For every other full-time title no hourly rate is published, so the grey ≈ line brackets it: the annual over 2,088 hours (a 40-hour week) to over 1,827 hours (a 35-hour week). Those are the two regular workweeks in the CSEA agreement on Riverhead's 261-workday year, and all 16 of the Water District's published rates land on exactly one or the other. The rosters don't say which workweek each title is on — that's why it's a range, and why it's arithmetic by this app rather than a rate the Board voted on. No hourly figure at all is shown for elected officials, board members (paid a stipend, not a wage) or sworn police, whose contract workweek these resolutions don't state.")
+                    Text("The teal line is what the Board's January 2026 salary resolutions actually print. Those rosters have an ANNUAL SALARY column and an HOURLY column, but the Town fills the hourly one in only for part-time staff and for the Water District — the one department that publishes both. For every other full-time title no hourly rate is published, so the grey ≈ line brackets it: the annual over 2,088 hours (a 40-hour week) to over 1,827 hours (a 35-hour week). Those are the two regular workweeks in the CSEA agreement on Riverhead's 261-workday year, and all 16 of the Water District's published rates land on exactly one or the other. The Town pays biweekly, but the rate is struck on that 261-day year, not on 26 × 80 hours. Police Officers and Detectives are bracketed on their own contract: the PBA agreement sets an eight-hour tour and a duty chart of 238 work days a year, or 260 during an officer's first 30 months. The rosters don't say which schedule each title is on — that's why it's a range, and why it's arithmetic by this app rather than a rate the Board voted on. No hourly figure at all is shown for elected officials, board members (paid a stipend, not a wage), or sergeants and above, a separate Superior Officers unit whose duty chart we don't hold.")
                 }
             }
         }
