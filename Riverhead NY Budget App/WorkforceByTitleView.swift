@@ -11,11 +11,28 @@
 
 import SwiftUI
 
+private struct Wage: Decodable {
+    let n: Int
+    let hrAvg: Double?
+    let hrMed: Double?
+    let annAvg: Int?
+    let annMed: Int?
+
+    var line: String {
+        var parts: [String] = []
+        if let a = hrAvg { parts.append(String(format: "avg $%.4f/hr", a)) }
+        if let m = hrMed { parts.append(String(format: "median $%.4f/hr", m)) }
+        if let y = annAvg { parts.append("~$\(y.formatted())/yr") }
+        return parts.isEmpty ? "" : "2026 authorized · " + parts.joined(separator: " · ")
+    }
+}
+
 private struct TitleRow: Decodable, Identifiable {
     let title: String
     let counts: [String: Int]
     let latest: Int
     let delta: Int
+    let wage2026: Wage?
     var id: String { title }
 }
 
@@ -132,6 +149,12 @@ private struct TitleRowView: View {
                             .foregroundStyle(v > 0 ? RiverheadTheme.textPrimary : .secondary)
                     }
                 }
+            }
+            if let w = row.wage2026, !w.line.isEmpty {
+                Text(w.line)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(RiverheadTheme.brandTeal)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .padding(.vertical, 2)
