@@ -13,17 +13,22 @@ import SwiftUI
 
 private struct Wage: Decodable {
     let n: Int
-    let hrAvg: Double?
-    let hrMed: Double?
-    let annAvg: Int?
-    let annMed: Int?
+    let hrMin: Double?
+    let hrMax: Double?
+    let annMin: Int?
+    let annMax: Int?
 
     var line: String {
         var parts: [String] = []
-        if let a = hrAvg { parts.append(String(format: "avg $%.4f/hr", a)) }
-        if let m = hrMed { parts.append(String(format: "median $%.4f/hr", m)) }
-        if let y = annAvg { parts.append("~$\(y.formatted())/yr") }
-        return parts.isEmpty ? "" : "2026 authorized · " + parts.joined(separator: " · ")
+        if let lo = hrMin, let hi = hrMax {
+            parts.append(lo == hi ? String(format: "$%.4f/hr", lo)
+                                  : String(format: "$%.4f–$%.4f/hr", lo, hi))
+        }
+        if let lo = annMin, let hi = annMax {
+            parts.append(lo == hi ? "$\(lo.formatted())/yr"
+                                  : "$\(lo.formatted())–$\(hi.formatted())/yr")
+        }
+        return parts.isEmpty ? "" : "2026 authorized rate · " + parts.joined(separator: " · ")
     }
 }
 
