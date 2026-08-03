@@ -168,10 +168,17 @@ struct CivicToolkitsHubView: View {
 
                 toolRow(
                     title: "Employee Pay Lookup",
-                    subtitle: "Search Newsday's gross earnings data for Town employees from 2018–2023.",
+                    subtitle: "Search Newsday's gross earnings data for Town employees (2019–2021). For current pay through 2025, see Payroll.",
                     symbol: "person.text.rectangle",
                     tint: RiverheadTheme.brandNavy
                 ) { GrossEarningsNewsdayView() }
+
+                toolRow(
+                    title: "Workforce by Title",
+                    subtitle: "How many employees hold each job title, and how each title's headcount changed 2022–2025.",
+                    symbol: "person.3.sequence.fill",
+                    tint: RiverheadTheme.brandTeal
+                ) { WorkforceByTitleView() }
             } header: {
                 Label("Officials & Accountability", systemImage: "eye.fill")
             }
