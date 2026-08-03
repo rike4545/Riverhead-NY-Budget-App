@@ -17,28 +17,17 @@
 
 import SwiftUI
 
-#if canImport(FirebaseCore)
-import FirebaseCore
-#endif
-
+// This app collects no analytics and contains no third-party SDKs. Firebase /
+// Google Analytics was removed deliberately: it never logged a single event, so
+// it produced no usable insight while adding an SDK, a network dependency, and
+// App Privacy disclosures to a civic-transparency app.
 @MainActor
 private final class RiverheadAppDelegate: NSObject, UIApplicationDelegate {
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
-        configureFirebaseIfPossible()
-        return true
-    }
-
-    private func configureFirebaseIfPossible() {
-        #if canImport(FirebaseCore)
-        guard FirebaseApp.app() == nil else { return }
-        guard Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil else { return }
-        FirebaseApp.configure()
-        // Honor the resident's analytics opt-out choice as early as possible.
-        AnalyticsConsent.applyStoredPreference()
-        #endif
+        true
     }
 }
 

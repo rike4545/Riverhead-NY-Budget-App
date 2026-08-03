@@ -22,8 +22,6 @@ struct SettingsView: View {
     @AppStorage("tax_exemptions")      private var exemptions: Double      = 0
     @AppStorage("tax_rate_per_1000")   private var ratePerThousand: Double = 61.9482
 
-    // MARK: - Privacy
-    @AppStorage(AnalyticsConsent.defaultsKey) private var analyticsEnabled: Bool = true
 
     // MARK: - Cached data (Council Scorecard)
     @AppStorage("council_scorecard_fetched_campaign_snapshots_json")  private var fetchedSnapshotsJSON: String  = ""
@@ -203,15 +201,20 @@ struct SettingsView: View {
 
     private var dataSection: some View {
         Section {
-            // Analytics opt-out
-            Toggle(isOn: $analyticsEnabled) {
-                Label("Share anonymous usage analytics", systemImage: "chart.bar.xaxis")
+            // No analytics at all — nothing to opt out of.
+            Label {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("No usage tracking")
+                    Text("This app collects no analytics and contains no third-party tracking SDKs. Nothing about how you use it leaves your device.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            } icon: {
+                Image(systemName: "hand.raised.slash")
             }
-            .onChange(of: analyticsEnabled) { _, newValue in
-                AnalyticsConsent.set(newValue)
-            }
-            .accessibilityLabel("Share anonymous usage analytics")
-            .accessibilityHint("When on, the app sends anonymous, non-advertising usage data to help improve it. Turn off to stop all analytics collection.")
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("No usage tracking. This app collects no analytics and contains no third-party tracking SDKs.")
 
             // Campaign filings cache
             Button {
@@ -265,7 +268,7 @@ struct SettingsView: View {
         } header: {
             Text("Data & Privacy")
         } footer: {
-            Text("Your property values, scorecard ratings, and cached filings stay on this device. If usage analytics is on, the app sends anonymous, non-advertising usage data (via Firebase) to help improve it — never linked to your identity, and with no advertising identifier. Campaign-finance data is fetched directly from NY Open Data (data.ny.gov).")
+            Text("Your property values, scorecard ratings, and cached filings stay on this device. The app collects no analytics and contains no third-party tracking SDKs — nothing about how you use it is sent anywhere. Campaign-finance data is fetched directly from NY Open Data (data.ny.gov).")
         }
     }
 
