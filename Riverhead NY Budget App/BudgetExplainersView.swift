@@ -60,6 +60,12 @@ struct BudgetExplainersView: View {
         let visualSteps: [VisualStep]
         let whyItMatters: String
         let practicalQuestion: String
+        /// The statute or standard behind it, where one exists. Statutory detail
+        /// follows OSC's "Information for Town Officials" (January 2026).
+        /// Riverhead is a town of the SECOND class — Town Law §10 puts every
+        /// Suffolk County town in that class regardless of population — so the
+        /// general budget deadlines apply, not the later Westchester/Monroe ones.
+        var authority: String? = nil
     }
 
     private struct VisualStep: Identifiable {
@@ -100,6 +106,37 @@ struct BudgetExplainersView: View {
                 practicalQuestion: "What changed this year: Town levy, assessed value, county/school share, or special districts?"
             ),
             .init(
+                category: .budgetMath,
+                symbol: "calendar.badge.clock",
+                accent: RiverheadTheme.gold,
+                title: "The Budget Calendar Is a Legal Deadline",
+                plainEnglish: "A town budget moves on dates fixed by statute, not by preference. Department estimates are due to the budget officer by September 20. The tentative budget must be filed with the Town Clerk by September 30, and the Clerk puts it before the Board by October 5. The Board revises it into the preliminary budget, publishes notice at least five days ahead, and holds the public hearing on the Thursday after the general election — adjournable, but never past November 15. The budget must be adopted by November 20.",
+                visualSteps: [
+                    .init(label: "Estimates 9/20", systemImage: "tray.and.arrow.down.fill", tint: RiverheadTheme.brandSky),
+                    .init(label: "Tentative 9/30", systemImage: "doc.text.fill", tint: RiverheadTheme.accent),
+                    .init(label: "Hearing", systemImage: "person.3.fill", tint: .green),
+                    .init(label: "Adopt 11/20", systemImage: "checkmark.seal.fill", tint: RiverheadTheme.gold)
+                ],
+                whyItMatters: "If the Board fails to adopt by November 20, the preliminary budget becomes the budget automatically. Letting the clock run out is not a way to block a budget — it is a way to pass one without a final vote. These are the general Town Law dates: Suffolk County towns are all towns of the second class, so the December 20 deadline you may see quoted applies only to Westchester and Monroe County towns.",
+                practicalQuestion: "When was the tentative budget filed, and how many days did the public actually have with the preliminary budget before the hearing?",
+                authority: "Town Law §§104, 106, 107, 108, 109"
+            ),
+            .init(
+                category: .pressurePoints,
+                symbol: "signature",
+                accent: .teal,
+                title: "How Salaries Get Set",
+                plainEnglish: "The Town Board fixes the pay of every town officer and employee, either by resolution or through a collective bargaining agreement, and it has to appear in the Board's minutes. Four salaries get extra protection: the proposed pay for each Board member, an elected town clerk, and an elected highway superintendent must be printed in the public-hearing notice for the preliminary budget.",
+                visualSteps: [
+                    .init(label: "Board fixes", systemImage: "gavel.fill", tint: .teal),
+                    .init(label: "Or contract", systemImage: "doc.plaintext.fill", tint: RiverheadTheme.brandSky),
+                    .init(label: "In the minutes", systemImage: "book.closed.fill", tint: RiverheadTheme.accent)
+                ],
+                whyItMatters: "The Board can raise those four salaries above the noticed figure, but only by local law subject to permissive referendum — meaning voters can force it to a vote. This is also why the January organizational-meeting resolutions are the authority behind the pay figures in this app: that is the document where the Board actually fixes the rates.",
+                practicalQuestion: "Was this salary set by Board resolution or by a union contract — and if it went up, was it noticed in the budget hearing?",
+                authority: "Town Law §§27, 108"
+            ),
+            .init(
                 category: .reserves,
                 symbol: "banknote",
                 accent: .green,
@@ -111,7 +148,8 @@ struct BudgetExplainersView: View {
                     .init(label: "Rebuild plan", systemImage: "arrow.trianglehead.2.clockwise.rotate.90", tint: RiverheadTheme.brandSky)
                 ],
                 whyItMatters: "The strongest reserve policy does not just say when money can be used. It also says how and when the cushion gets rebuilt.",
-                practicalQuestion: "Is this use one-time, does it drop reserves below the floor, and what is the rebuild plan next year?"
+                practicalQuestion: "Is this use one-time, does it drop reserves below the floor, and what is the rebuild plan next year?",
+                authority: "Town Law §103; GASB Statement No. 54"
             ),
             .init(
                 category: .reserves,
@@ -125,7 +163,8 @@ struct BudgetExplainersView: View {
                     .init(label: "Next year gap", systemImage: "exclamationmark.triangle.fill", tint: .orange)
                 ],
                 whyItMatters: "A budget can look balanced now and still create a structural gap next year if one-time money is carrying recurring costs. Riverhead's $29.7M unassigned fund balance (of a $33.4M General Fund balance) could erase the entire 2027 cap gap on paper — but it is one-time money against a cost that returns every year, so it would buy one budget and leave the same hole behind.",
-                practicalQuestion: "Which part of this plan disappears after one year, and which costs still remain?"
+                practicalQuestion: "Which part of this plan disappears after one year, and which costs still remain?",
+                authority: "Chapter 528 of the Laws of 2000"
             ),
             .init(
                 category: .pressurePoints,
@@ -153,7 +192,8 @@ struct BudgetExplainersView: View {
                     .init(label: "Show both", systemImage: "rectangle.split.2x1.fill", tint: .green)
                 ],
                 whyItMatters: "A project can be affordable to build and still create new recurring costs after the ribbon-cutting.",
-                practicalQuestion: "Will this project add recurring operating costs after construction is complete?"
+                practicalQuestion: "Will this project add recurring operating costs after construction is complete?",
+                authority: "Town Law §103 (capital project); Town Law §111 (capital appropriations do not lapse)"
             ),
             .init(
                 category: .pressurePoints,
@@ -167,7 +207,8 @@ struct BudgetExplainersView: View {
                     .init(label: "Public reason", systemImage: "quote.bubble.fill", tint: RiverheadTheme.gold)
                 ],
                 whyItMatters: "The public question is not just whether an override happens. It is whether the Town shows a cap-compliant baseline, clear findings, and a path back to stability. Riverhead has adopted overrides in 2023, 2024, and 2026, and on current trends the 2027 levy pierces the cap by about $2.62M — so this is a live question, not a hypothetical.",
-                practicalQuestion: "What would the budget look like under the cap, and what exactly does an override fund? (The 2027 Spending Reduction deep dive below works this out line by line.)"
+                practicalQuestion: "What would the budget look like under the cap, and what exactly does an override fund? (The 2027 Spending Reduction deep dive below works this out line by line.)",
+                authority: "General Municipal Law §3-c (enacted 2011, effective for fiscal years beginning 2012)"
             ),
 
             // MARK: GASB Accounting
@@ -183,7 +224,8 @@ struct BudgetExplainersView: View {
                     .init(label: "Assigned / Unassigned", systemImage: "hand.raised.fill", tint: .green)
                 ],
                 whyItMatters: "A town can report a large total fund balance and still have very little that is legally free to spend. OSC's GASB 54 guidance, adopted by NYS local governments, requires every budget document to show which tier each dollar sits in.",
-                practicalQuestion: "Of the fund balance shown in this budget, how much is actually unassigned, and what are the constraints on the rest?"
+                practicalQuestion: "Of the fund balance shown in this budget, how much is actually unassigned, and what are the constraints on the rest?",
+                authority: "Town Law §103; GASB Statement No. 54"
             ),
             .init(
                 category: .gasbAccounting,
@@ -197,7 +239,8 @@ struct BudgetExplainersView: View {
                     .init(label: "ARM rules apply", systemImage: "doc.text.fill", tint: RiverheadTheme.brandSky)
                 ],
                 whyItMatters: "OSC's Accounting Reference Manual (ARM), Chapter 6, controls how these are recorded. Using a transfer when a loan is intended can misrepresent a fund's real financial condition and create audit findings.",
-                practicalQuestion: "Is this an interfund loan with a repayment schedule, or a permanent transfer, and does the board resolution reflect that distinction?"
+                practicalQuestion: "Is this an interfund loan with a repayment schedule, or a permanent transfer, and does the board resolution reflect that distinction?",
+                authority: "General Municipal Law §9-a"
             ),
             .init(
                 category: .gasbAccounting,
@@ -211,7 +254,8 @@ struct BudgetExplainersView: View {
                     .init(label: "GAAP result", systemImage: "chart.line.uptrend.xyaxis", tint: .green)
                 ],
                 whyItMatters: "OSC audits and the annual Comptroller report compare GAAP results. A town that looks fine in the budget can show structural deterioration in the audited statements because of deferred liabilities, recognition timing, or encumbrance treatment.",
-                practicalQuestion: "Does the budget presentation reconcile to GAAP, and what adjustments create the biggest gap between the two?"
+                practicalQuestion: "Does the budget presentation reconcile to GAAP, and what adjustments create the biggest gap between the two?",
+                authority: "Town Law §§110, 111, 117"
             ),
 
             // MARK: Fiscal Stress
@@ -227,7 +271,8 @@ struct BudgetExplainersView: View {
                     .init(label: "OSC designation", systemImage: "exclamationmark.triangle.fill", tint: .red)
                 ],
                 whyItMatters: "A municipality can avoid an FSMS designation while still trending toward fiscal stress. The indicators OSC watches — especially recurring deficits, low unassigned fund balance, and negative cash — are the same ones that predict multi-year problems.",
-                practicalQuestion: "Where does Riverhead currently score on each FSMS indicator, and which ones are trending in the wrong direction?"
+                practicalQuestion: "Where does Riverhead currently score on each FSMS indicator, and which ones are trending in the wrong direction?",
+                authority: "OSC Fiscal Stress Monitoring System, built from filed Annual Financial Reports"
             ),
             .init(
                 category: .fiscalStress,
@@ -285,7 +330,8 @@ struct BudgetExplainersView: View {
                     .init(label: "OSC notification", systemImage: "bell.fill", tint: .purple)
                 ],
                 whyItMatters: "OSC must be notified of deficiency notes. They appear on the municipality's audit history. A pattern of budget notes or deficiency notes is an early stress indicator and often precedes FSMS designation.",
-                practicalQuestion: "Has Riverhead ever issued a budget note or deficiency note, and what was the cause?"
+                practicalQuestion: "Has Riverhead ever issued a budget note or deficiency note, and what was the cause?",
+                authority: "Local Finance Law §29.00 (ordinarily capped at 5% of the annual budget)"
             ),
             .init(
                 category: .debtInstruments,
@@ -299,7 +345,8 @@ struct BudgetExplainersView: View {
                     .init(label: "Convert to bonds", systemImage: "arrow.2.circlepath", tint: .green)
                 ],
                 whyItMatters: "Riverhead currently carries BANs for capital projects. If a BAN matures and market conditions make permanent bonding expensive, the Town faces higher debt service costs or must roll the BAN again. OSC tracks BAN-heavy capital profiles as a monitoring item.",
-                practicalQuestion: "What BANs are outstanding, when do they mature, and is the capital plan funded to convert them?"
+                practicalQuestion: "What BANs are outstanding, when do they mature, and is the capital plan funded to convert them?",
+                authority: "Local Finance Law"
             )
         ]
     }
@@ -443,6 +490,13 @@ struct BudgetExplainersView: View {
 
             insightRow(title: "Why it matters", body: item.whyItMatters)
             insightRow(title: "Question to ask", body: item.practicalQuestion, accent: RiverheadTheme.accent)
+
+            if let authority = item.authority {
+                Text("Authority: \(authority)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
