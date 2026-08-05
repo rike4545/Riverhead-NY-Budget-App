@@ -33,6 +33,7 @@ struct CouncilScorecardView: View {
         let termEnds: Date?
         let nextElection: Date?
         let annualPay: Double?
+        var annualPayNote: String? = nil
         let committeeLiaisons: [String]
         let profileURL: URL?
         let termSourceURL: URL?
@@ -606,6 +607,7 @@ struct CouncilScorecardView: View {
                 termEnds: makeDate(year: 2026, month: 12, day: 31),
                 nextElection: makeDate(year: 2026, month: 11, day: 3),
                 annualPay: 110_000,
+                annualPayNote: "Voluntarily reduced from $118,919 at the Jan 6, 2026 Town Board meeting.",
                 committeeLiaisons: [
                     "Personnel"
                 ],
@@ -2157,6 +2159,13 @@ struct CouncilScorecardView: View {
             collapsibleSection(title: "Filings and Pay Reporting", systemImage: "doc.text.magnifyingglass") {
                 campaignDisclosureStrip(for: member)
                 electedOfficialReportingCard
+                if let note = member.annualPayNote {
+                    Text("Pay note: \(note)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, 4)
+                }
             }
 
             HStack(spacing: 12) {
@@ -2542,7 +2551,8 @@ struct CouncilScorecardView: View {
 
     private func payText(for member: CouncilMember) -> String {
         guard let annualPay = member.annualPay else { return "Not listed" }
-        return currencyFormatter.string(from: NSNumber(value: annualPay)) ?? "$0"
+        let base = currencyFormatter.string(from: NSNumber(value: annualPay)) ?? "$0"
+        return member.annualPayNote != nil ? "\(base) (voluntarily reduced)" : base
     }
 
     private func liaisonCountText(for member: CouncilMember) -> String {
