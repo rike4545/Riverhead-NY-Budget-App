@@ -160,6 +160,7 @@ private extension RiverheadCampaignContributionsView {
                 BulletRow(text: "J. Petrocelli Contracting")
                 BulletRow(text: "J. Petrocelli Contracting, Inc.")
                 BulletRow(text: "J. Petrocelli Development Inc")
+                BulletRow(text: "J. Petrocelli Development Associates")
                 BulletRow(text: "J Petrocelli Wine Cellars LLC")
                 BulletRow(text: "J. Petrocelli Cellars, LLC")
                 BulletRow(text: "Hp East End Riverhead LLC")
