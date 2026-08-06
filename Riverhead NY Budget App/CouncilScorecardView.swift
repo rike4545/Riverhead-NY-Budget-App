@@ -4143,6 +4143,10 @@ struct CouncilScorecardView: View {
             names.insert("ken rothwell")
         } else if member.name.contains("Waski") {
             names.insert("joann waski")
+            // Also appears as "Joann Spanburgh-Waski" and "Joann Spanburgh" in some records.
+            names.insert("joann spanburgh-waski")
+            names.insert("joann spanburgh waski")
+            names.insert("joann spanburgh")
         } else if member.name.contains("Kern") {
             names.insert("robert kern")
             names.insert("bob kern")
