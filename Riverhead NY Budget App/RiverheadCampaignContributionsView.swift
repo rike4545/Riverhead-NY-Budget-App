@@ -25,6 +25,9 @@ struct RiverheadCampaignContributionsView: View {
                 aggregationCard
                 relatedPartyCard
                 thresholdCard
+                electoralContributionLimitsCard
+                familyAggregateLimitCard
+                constitutedCommitteeRulesCard
                 recusalDisclosureCard
                 allowedVsProhibitedCard
                 claimVsCodeCard
@@ -312,6 +315,92 @@ private extension RiverheadCampaignContributionsView {
         }
     }
 
+    var electoralContributionLimitsCard: some View {
+        InfoCard(title: "Electoral Contribution Limits (§ 14-114)", systemImage: "dollarsign.square") {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Separate from the ethics code, NY Election Law § 14-114 caps how much any individual, corporation, PAC, or union may contribute to a candidate per election. For Town of Riverhead in 2026:")
+                    .fixedSize(horizontal: false, vertical: true)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Per contributor, per election")
+                        .font(.subheadline.bold())
+                    LimitRow(label: "General election", value: "$1,219.30")
+                    LimitRow(label: "Any primary", value: "$1,000.00")
+                    LimitRow(label: "Corporations, PACs & unions", value: "Same per-candidate limits")
+                }
+
+                HighlightBox(
+                    title: "Corporate aggregate cap",
+                    message: "Corporations also face a $5,000 statewide aggregate limit per calendar year across all NY political contributions combined under § 14-116 — separate from, and in addition to, the per-candidate limit."
+                )
+
+                Text("Source: Suffolk County BOE 2026 Comprehensive Limits Report; NCSL 2025–26 State Limits on Contributions to Candidates.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    var familyAggregateLimitCard: some View {
+        InfoCard(title: "Family Aggregate Cap (§ 14-114)", systemImage: "person.3") {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("On top of the per-person limit, § 14-114 caps the combined total that all immediate family members may contribute to a single candidate per election.")
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text("Immediate family: child, parent, grandparent, sibling, and their spouses.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("All family members combined — Town of Riverhead 2026")
+                        .font(.subheadline.bold())
+                    LimitRow(label: "General election", value: "$6,335.25")
+                    LimitRow(label: "Democratic primary", value: "$1,728.50")
+                    LimitRow(label: "Republican primary", value: "$2,229.75")
+                }
+
+                HighlightBox(
+                    title: "Formula",
+                    message: "Family aggregate = ¼ × registered voters in the district. For Riverhead town-wide races: ¼ × 25,341 total registered = $6,335.25 (general); primary uses registered party voters only."
+                )
+
+                Text("Source: Suffolk County BOE voter enrollment, Feb 20, 2026 (25,341 total; 6,914 Democrats; 8,919 Republicans).")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    var constitutedCommitteeRulesCard: some View {
+        InfoCard(title: "Party Committee Rules (Constituted Committees)", systemImage: "building.2") {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Constituted (party) committees operate under a separate, more permissive limit schedule than candidate committees.")
+                    .fixedSize(horizontal: false, vertical: true)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("2026 limits — Suffolk County constituted committees")
+                        .font(.subheadline.bold())
+                    LimitRow(label: "Individual (per calendar year)", value: "$117,300")
+                    LimitRow(label: "Corporate (statewide aggregate)", value: "$5,000")
+                    LimitRow(label: "Housekeeping fund", value: "No limit")
+                }
+
+                HighlightBox(
+                    title: "Housekeeping",
+                    message: "No contribution limits apply to funds designated for housekeeping expenses. Only constituted committees may maintain a housekeeping fund for physical headquarters upkeep."
+                )
+
+                Text("Source: Suffolk County BOE 2026 Comprehensive Limits Report; NCSL 2025–26.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
     var backgroundGradient: LinearGradient {
         LinearGradient(
             colors: [
@@ -414,6 +503,22 @@ private struct HighlightBox: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color(.secondarySystemGroupedBackground))
         )
+    }
+}
+
+private struct LimitRow: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Spacer()
+            Text(value)
+                .font(.subheadline.weight(.semibold))
+        }
     }
 }
 
