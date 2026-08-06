@@ -640,9 +640,9 @@ struct CouncilScorecardView: View {
                 serviceStarted: makeDate(year: 2021, month: 1, day: 1),
                 termStarts: makeDate(year: 2026, month: 1, day: 1),
                 termEnds: makeDate(year: 2028, month: 12, day: 31),
-                // Rothwell is actively running for Supervisor in the Nov 2026 election (same race
-                // as Halpin) rather than waiting out his council term through 2028 — his next
-                // electoral event is 2026-11-03, not his council seat's regular 2028 term-end.
+                // Rothwell is running for Supervisor in the Nov 3, 2026 election. The Nov 2026
+                // race decides only the Supervisor post; he retains his council seat through
+                // 2028 unless elected and sworn in as Supervisor (at which point he would resign).
                 nextElection: makeDate(year: 2026, month: 11, day: 3),
                 annualPay: 50_558,
                 committeeLiaisons: [
@@ -4117,6 +4117,12 @@ struct CouncilScorecardView: View {
         if type == "candidate/candidate spouse" || type == "candidate family member" {
             return true
         }
+        // Cross-campaign committee donations: another candidate's committee donating to a
+        // Riverhead official's committee (e.g. "Friends of Kathleen Rice"). Excludes routine
+        // party/county committee donations which are common and expected.
+        if type.contains("committee") && !type.contains("party") && !type.contains("county") && !donorName.isEmpty {
+            return true
+        }
 
         let normalizedDonor = donorName.lowercased()
         if candidateSelfNames(for: member).contains(normalizedDonor) {
@@ -4150,9 +4156,13 @@ struct CouncilScorecardView: View {
 
     // Normalized "last|first" key used to match a payroll employee against a campaign donor
     // by name only (case-insensitive, first name reduced to its first token, no middle names).
+    // Hyphens in last names are normalized to spaces so "Jens-Smith" and "Jens Smith" match.
     private func donorNameKey(last: String?, first: String?) -> String? {
-        let l = (last ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        let f = (first ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased().split(separator: " ").first.map(String.init) ?? ""
+        let l = (last ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "-", with: " ")
+            .lowercased()
+        let f = (first ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            .components(separatedBy: CharacterSet(charactersIn: " -")).first ?? ""
         guard !l.isEmpty, !f.isEmpty else { return nil }
         return "\(l)|\(f)"
     }
