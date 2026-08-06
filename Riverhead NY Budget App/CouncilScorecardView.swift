@@ -3516,7 +3516,7 @@ struct CouncilScorecardView: View {
                     .foregroundStyle(.orange)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text("Scope (2005–2026): this is a corporate/project-interest watch, not candidate immediate-family support. It matches Petrocelli-named donor fields (covering J Petrocelli Construction, J. Petrocelli Contracting, J. Petrocelli Development Inc, J. Petrocelli Cont. Inc, J Petrocelli Wine Cellars LLC, J. Petrocelli Cellars LLC, J. Petrocelli Riverhead Town Square LLC, M. Petrocelli, Marie Petrocelli, Michael Petrocelli, Jennifer Petrocelli) and Hp East End Riverhead LLC, as well as known related business/venue watch terms from public profiles, including Jacqueline Phillips, Alexandra Bussi, The Preston House, Atlantis Banquets, Sea Star Ballroom, Taste the East End, Raphael Vineyard, Long Island Aquarium, and Hyatt Place East End. The public-source basis includes Schneps / QNS and Dan's Papers profiles. These matches are transparency context, not proof of coordination or quid pro quo.")
+                Text("Scope (2005–2026): this is a corporate/project-interest watch, not candidate immediate-family support. It matches any donor field containing \"Petrocelli\" — covering J. Petrocelli Development Associates, J. Petrocelli Contracting, J. Petrocelli Construction, J. Petrocelli Development Inc, J. Petrocelli Cellars LLC, J. Petrocelli Wine Cellars LLC, J. Petrocelli Riverhead Town Square LLC, M. Petrocelli, Marie Petrocelli, Michael Petrocelli, Jennifer Petrocelli, and other variants. Also matches HP East End Riverhead LLC / H.P. East End Riverhead LLC — the operating entity for the Hyatt Place Long Island / East End hotel at 451 East Main Street, Riverhead, developed by J. Petrocelli. Additional venue/entity watch terms from public profiles: Jacqueline Phillips, Alexandra Bussi, The Preston House, Atlantis Banquets, Sea Star Ballroom, Taste the East End, Raphael Vineyard, Long Island Aquarium (also constructed by J. Petrocelli Contracting), Hyatt Place Long Island / East End, Hyatt Place East End. Source basis: Schneps / QNS and Dan's Papers profiles. These matches are transparency context, not proof of coordination or quid pro quo.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -4033,9 +4033,12 @@ struct CouncilScorecardView: View {
             row.flng_ent_middle_name,
             row.flng_ent_last_name
         ]
+        // Strip periods so "H.P. East End Riverhead LLC" normalizes to the same
+        // string as "HP East End Riverhead LLC" — both forms appear in NY Open Data.
         let haystack = fields
             .compactMap { $0?.lowercased() }
             .joined(separator: " ")
+            .replacingOccurrences(of: ".", with: "")
 
         let relatedTerms = [
             "petrocelli",
@@ -4048,7 +4051,10 @@ struct CouncilScorecardView: View {
             "taste the east end",
             "raphael vineyard",
             "long island aquarium",
-            "hyatt place east end"
+            "hyatt place east end",
+            // "Hyatt Place Long Island / East End" (hotel public name) does not
+            // contain "hyatt place east end" as a substring — both terms needed.
+            "hyatt place long island"
         ]
 
         return relatedTerms.contains { haystack.contains($0) }
