@@ -166,7 +166,7 @@ private extension RiverheadCampaignContributionsView {
                 BulletRow(text: "J. Petrocelli Development Associates")
                 BulletRow(text: "J Petrocelli Wine Cellars LLC")
                 BulletRow(text: "J. Petrocelli Cellars, LLC")
-                BulletRow(text: "Hp East End Riverhead LLC")
+                BulletRow(text: "Hp East End Riverhead LLC (Hyatt Place Long Island / East End)")
                 BulletRow(text: "J. Petrocelli Riverhead Town Square LLC")
 
                 Text("Individuals to search")
@@ -182,7 +182,7 @@ private extension RiverheadCampaignContributionsView {
                 Text("Hospitality and affiliated assets")
                     .font(.subheadline.bold())
 
-                BulletRow(text: "The Preston House, Atlantis Banquets, Sea Star Ballroom, Taste the East End, Raphael Vineyard, Long Island Aquarium, and Hyatt Place East End.")
+                BulletRow(text: "The Preston House, Atlantis Banquets, Sea Star Ballroom, Taste the East End, Raphael Vineyard, Long Island Aquarium, and Hyatt Place Long Island / East End.")
 
                 Divider()
 
