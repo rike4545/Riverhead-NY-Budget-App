@@ -206,6 +206,94 @@ struct BoardElectionsView: View {
                 }
             }
 
+            // ---- What the law actually requires of these offices ----
+            Section {
+                Text("The votes above put these people in office. This is what the law asked of them before they could stand for it — for the Supervisor and every Council member alike, since the qualifications are identical.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                ForEach(OfficeQualifications.electedRequirements) { requirementRow($0) }
+            } header: {
+                Label("What the Job Legally Requires", systemImage: "checkmark.seal")
+            }
+
+            Section {
+                Text(OfficeQualifications.electorLede)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                ForEach(OfficeQualifications.electorTests) { t in
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(t.label).font(.footnote.weight(.semibold))
+                        Text(t.detail).font(.caption).foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 2)
+                }
+                Text(OfficeQualifications.electorDisqualified).font(.caption).foregroundStyle(.secondary)
+                Text(OfficeQualifications.electorNote).font(.caption).foregroundStyle(.secondary)
+                Text(OfficeQualifications.electorSources).font(.caption2).foregroundStyle(.tertiary)
+            } header: {
+                Label(OfficeQualifications.electorTitle, systemImage: "person.text.rectangle")
+            }
+
+            Section {
+                ForEach(OfficeQualifications.notRequired, id: \.self) { item in
+                    Label(item, systemImage: "xmark")
+                        .font(.footnote)
+                        .labelStyle(.titleAndIcon)
+                }
+                Text(OfficeQualifications.notRequiredClosing)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Label(OfficeQualifications.notRequiredTitle, systemImage: "nosign")
+            }
+
+            Section {
+                Text(OfficeQualifications.termLimitAdopted).font(.caption2).foregroundStyle(.tertiary)
+                Text(OfficeQualifications.termLimitIntent).font(.footnote)
+                Text(OfficeQualifications.termLimitMechanics).font(.footnote).foregroundStyle(.secondary)
+                Text(OfficeQualifications.termLimitAuthority).font(.caption).foregroundStyle(.secondary)
+            } header: {
+                Label(OfficeQualifications.termLimitTitle, systemImage: "clock.arrow.circlepath")
+            }
+
+            Section {
+                Text(OfficeQualifications.electedOfficesLede).font(.footnote).foregroundStyle(.secondary)
+                Text(OfficeQualifications.electedOffices.joined(separator: " · "))
+                    .font(.footnote.weight(.semibold))
+                ForEach(OfficeQualifications.codeDecisions) { d in
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(d.what).font(.footnote.weight(.semibold))
+                        Text(d.detail).font(.caption).foregroundStyle(.secondary)
+                        Text(d.source).font(.caption2).foregroundStyle(.tertiary)
+                    }
+                    .padding(.vertical, 2)
+                }
+            } header: {
+                Label(OfficeQualifications.electedOfficesTitle, systemImage: "checklist")
+            }
+
+            Section {
+                ForEach(OfficeQualifications.oddYearBody, id: \.self) { para in
+                    Text(para).font(.footnote).foregroundStyle(.secondary)
+                }
+            } header: {
+                Label(OfficeQualifications.oddYearTitle, systemImage: "calendar.badge.exclamationmark")
+            }
+
+            Section {
+                Text(OfficeQualifications.staffLede).font(.footnote).foregroundStyle(.secondary)
+                ForEach(OfficeQualifications.staffRequirements) { requirementRow($0) }
+                Text(OfficeQualifications.officerVsEmployee).font(.caption).foregroundStyle(.secondary)
+            } header: {
+                Label(OfficeQualifications.staffTitle, systemImage: "person.2.badge.gearshape")
+            }
+
+            Section {
+                Text(OfficeQualifications.disclaimer)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+
             Section {
                 Text(BoardElectionsData.priorElectionsNote)
                     .font(.caption2)
@@ -220,6 +308,25 @@ struct BoardElectionsView: View {
         }
         .navigationTitle("Board Elections")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    @ViewBuilder
+    private func requirementRow(_ r: OfficeRequirement) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(r.label.uppercased())
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(.tertiary)
+            Text(r.value)
+                .font(.subheadline.weight(.semibold))
+            Text(r.detail)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(r.source)
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.vertical, 3)
+        .accessibilityElement(children: .combine)
     }
 
     private func statTile(_ label: String, _ value: String, _ sub: String) -> some View {
