@@ -375,6 +375,18 @@ struct MoreView: View {
             }
 
             NavigationLink {
+                OvertimeStaffingView()
+            } label: {
+                Label("Overtime & Staffing", systemImage: "clock.badge.exclamationmark")
+            }
+
+            NavigationLink {
+                SeparationPayView()
+            } label: {
+                Label("Separation Pay", systemImage: "figure.walk.departure")
+            }
+
+            NavigationLink {
                 PluralityGovernanceView()
             } label: {
                 Label("Plurality & Oversight", systemImage: "person.3.sequence.fill")
