@@ -2,8 +2,10 @@
 //  RoadsDashboardView.swift
 //  Riverhead NY Budget App
 //
-//  Highway & roads spending dashboard with Southold and Brookhaven peer comparison.
-//  All peer figures sourced from each town's published adopted budget documents.
+//  Highway & roads spending dashboard, with a per-maintained-mile comparison
+//  against every other town in Suffolk County. Peer figures come from
+//  RoadSpendingPeers (State Comptroller filings + NYSDOT mileage), not from
+//  separately-scoped town budget documents.
 //
 //  Swift 6 · iOS 17+
 //
@@ -19,7 +21,12 @@ struct RoadsDashboardView: View {
 
     // MARK: - Riverhead road facts
 
-    private let riverheadRoadMiles:  Double = 230
+    // NYSDOT's locally maintained centerline mileage — the same basis used for
+    // every peer town, so the per-mile figures on this screen are comparable.
+    // The Town's own Highway Department page says "approximately 230 miles";
+    // that count is not on a stated basis and would make Riverhead look cheaper
+    // per mile than a like-for-like comparison supports.
+    private var riverheadRoadMiles: Double { RoadSpendingPeers.riverhead.roadMiles }
     private let riverheadLandSqMi:   Double = 67.43
 
     private struct YearPoint: Identifiable {
@@ -29,51 +36,42 @@ struct RoadsDashboardView: View {
     }
 
     // MARK: - Peer comparison data
-    // Sources: each town's most recent published adopted budget.
 
+    // Peer comparison now comes from RoadSpendingPeers — all ten Suffolk towns on
+    // one consistent basis (OSC "Highways" expenditures over NYSDOT locally
+    // maintained centerline miles). The previous version compared three towns'
+    // adopted-budget appropriations over estimated mileage, which is not
+    // like-for-like: adopted highway lines bundle benefits, debt and capital
+    // differently by town, and the budget years did not match. It reported
+    // Southold near $56,000 per mile against a comparable figure of ~$24,000.
     private struct PeerTown: Identifiable {
         let id = UUID()
         let name: String
-        let highwayFundTotal: Double  // latest adopted budget (appropriations)
+        let highwayFundTotal: Double
         let roadMiles: Double
-        let totalBudget: Double       // all funds, same year
-        let budgetYear: Int
-        let source: String
         var color: Color
 
-        var spendPerMile: Double   { highwayFundTotal / roadMiles }
-        var highwaySharePct: Double { highwayFundTotal / totalBudget * 100 }
+        var spendPerMile: Double { highwayFundTotal / roadMiles }
     }
 
-    private var peers: [PeerTown] { [
-        PeerTown(
-            name: "Riverhead",
-            highwayFundTotal: latestAppropriation?.value ?? 8_200_000,
-            roadMiles: riverheadRoadMiles,
-            totalBudget: 69_113_159,
-            budgetYear: latestAppropriation?.year ?? 2026,
-            source: "2026 Adopted Budget",
-            color: RiverheadTheme.accent
-        ),
-        PeerTown(
-            name: "Southold",
-            highwayFundTotal: 11_200_000,
-            roadMiles: 200,
-            totalBudget: 58_400_000,
-            budgetYear: 2024,
-            source: "2024 Adopted Budget (townofSouthold.gov)",
-            color: RiverheadTheme.brandTeal
-        ),
-        PeerTown(
-            name: "Brookhaven",
-            highwayFundTotal: 52_800_000,
-            roadMiles: 1_500,
-            totalBudget: 556_000_000,
-            budgetYear: 2026,
-            source: "2026 Adopted Budget (brookhavenny.gov)",
-            color: RiverheadTheme.brandGold
-        ),
-    ] }
+    /// Riverhead plus the two nearest East End peers, for the compact card list.
+    private var peers: [PeerTown] {
+        let featured = ["Riverhead", "Southold", "Southampton"]
+        let palette: [String: Color] = [
+            "Riverhead": RiverheadTheme.accent,
+            "Southold": RiverheadTheme.brandTeal,
+            "Southampton": RiverheadTheme.brandGold,
+        ]
+        return featured.compactMap { name in
+            guard let p = RoadSpendingPeers.all.first(where: { $0.name == name }) else { return nil }
+            return PeerTown(
+                name: p.name,
+                highwayFundTotal: p.highwaySpending,
+                roadMiles: p.roadMiles,
+                color: palette[name] ?? RiverheadTheme.brandTeal
+            )
+        }
+    }
 
     // MARK: - Store-derived series
 
@@ -124,7 +122,8 @@ struct RoadsDashboardView: View {
             trendSection
             peerComparisonSection
             spendPerMileChartSection
-            highwayShareChartSection
+            suffolkRankingSection
+            roadCaveatsSection
             chipsSection
             notesSection
         }
@@ -141,8 +140,8 @@ struct RoadsDashboardView: View {
         Section {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
                 metricTile(
-                    title: "Road Miles",
-                    value: "230",
+                    title: "Maintained Road Miles",
+                    value: String(format: "%.0f", RoadSpendingPeers.riverhead.roadMiles),
                     symbol: "road.lanes",
                     tint: RiverheadTheme.accent
                 )
@@ -317,21 +316,14 @@ struct RoadsDashboardView: View {
             .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
 
             // Source note
-            VStack(alignment: .leading, spacing: 4) {
-                ForEach(peers) { town in
-                    Text("• \(town.name) \(town.budgetYear): \(town.source)")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-                Text("• Peer road-mile figures are approximate based on each town's highway department records and published maintenance reports.")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
-            .padding(.top, 4)
+            Text(RoadSpendingPeers.sourceNote)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .padding(.top, 4)
         } header: {
             Label("Peer Comparison", systemImage: "chart.bar.xaxis.ascending")
         } footer: {
-            Text("Spend per road mile is a rough directional metric. Towns differ in terrain, road type mix, contractor vs. in-house labor, and capital vs. operating split. Use for trend context, not as a unit-cost standard.")
+            Text("Every Suffolk town files the same annual report to the State Comptroller on the same chart of accounts, so \"Highways\" means the same thing in each. Towns still differ in terrain, road mix and how much work is contracted out, so treat this as context rather than a unit-cost standard.")
         }
     }
 
@@ -357,45 +349,82 @@ struct RoadsDashboardView: View {
             }
             .frame(height: 200)
             .padding(.vertical, 6)
-            .accessibilityLabel("Bar chart comparing highway spending per road mile across Riverhead, Southold, and Brookhaven")
+            .accessibilityLabel("Bar chart comparing highway spending per road mile across Riverhead, Southold and Southampton")
         } header: {
             Label("Highway Spending per Road Mile", systemImage: "dollarsign.lane")
         }
     }
 
-    // MARK: - Highway share of total budget
+    // MARK: - All ten Suffolk towns, ranked
 
-    private var highwayShareChartSection: some View {
+    // Replaces a "highway fund as % of total budget" chart that compared each
+    // town's highway line against its own total budget. Those totals differ
+    // wildly in scope (enterprise funds, districts), so the percentages were not
+    // comparable. Spend per maintained mile is, and showing all ten towns puts
+    // Riverhead's position in context rather than against two hand-picked peers.
+    private var suffolkRankingSection: some View {
         Section {
-            Chart(peers) { town in
-                BarMark(
-                    x: .value("Town", town.name),
-                    y: .value("% of budget", town.highwaySharePct)
-                )
-                .foregroundStyle(town.color.gradient)
-                .cornerRadius(6)
-                .annotation(position: .top, alignment: .center) {
-                    Text(String(format: "%.1f%%", town.highwaySharePct))
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .chartYScale(domain: 0...20)
-            .chartYAxis {
-                AxisMarks(values: [0, 5, 10, 15, 20]) { value in
-                    AxisGridLine()
-                    AxisValueLabel {
-                        if let v = value.as(Double.self) {
-                            Text(String(format: "%.0f%%", v))
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(RoadSpendingPeers.all.sorted { $0.spendPerMile > $1.spendPerMile }) { town in
+                    let isRiverhead = town.name == RoadSpendingPeers.riverheadName
+                    HStack(spacing: 8) {
+                        Text(town.name)
+                            .font(.caption.weight(isRiverhead ? .bold : .regular))
+                            .foregroundStyle(isRiverhead ? RiverheadTheme.accent : .primary)
+                            .frame(width: 92, alignment: .leading)
+
+                        GeometryReader { geo in
+                            let frac = town.spendPerMile / RoadSpendingPeers.maxSpendPerMile
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(isRiverhead ? RiverheadTheme.accent : Color.secondary.opacity(0.35))
+                                .frame(width: max(2, geo.size.width * frac), height: 14)
+                                .frame(maxHeight: .infinity, alignment: .center)
                         }
+                        .frame(height: 16)
+
+                        Text(shortMoney(town.spendPerMile))
+                            .font(.caption.weight(isRiverhead ? .bold : .regular))
+                            .monospacedDigit()
+                            .frame(width: 60, alignment: .trailing)
+
+                        Text("\(Int(town.roadMiles)) mi")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .frame(width: 52, alignment: .trailing)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("\(town.name): \(shortMoney(town.spendPerMile)) per mile across \(Int(town.roadMiles)) maintained miles")
+                }
+
+                Divider().padding(.vertical, 2)
+
+                Text("Median across the ten towns: \(shortMoney(RoadSpendingPeers.medianSpendPerMile)) per mile. Riverhead ranks \(RoadSpendingPeers.riverheadRank) of 10, about \(Int((RoadSpendingPeers.riverheadVsMedian * 100).rounded()))% below it — spending at the median rate across its \(Int(RoadSpendingPeers.riverhead.roadMiles)) miles would cost roughly \(shortMoney(RoadSpendingPeers.gapToMedianAnnual)) more a year.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.vertical, 4)
+        } header: {
+            Label("Every Suffolk Town, FY\(RoadSpendingPeers.fiscalYear)", systemImage: "list.number")
+        } footer: {
+            Text("Spending less per mile than your neighbours is a question, not a result: it can mean an efficient operation or roads being allowed to degrade. Neither dataset measures pavement condition, and the Town publishes no pavement-condition rating.")
+        }
+    }
+
+    // MARK: - Limits of the comparison
+
+    private var roadCaveatsSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 6) {
+                ForEach(RoadSpendingPeers.caveats, id: \.self) { c in
+                    HStack(alignment: .top, spacing: 6) {
+                        Text("\u{2022}").foregroundStyle(.secondary)
+                        Text(c).font(.caption).foregroundStyle(.secondary)
                     }
                 }
             }
-            .frame(height: 200)
-            .padding(.vertical, 6)
-            .accessibilityLabel("Bar chart comparing highway fund as a percentage of each town's total budget")
+            .padding(.vertical, 2)
         } header: {
-            Label("Highway Fund as % of Total Budget", systemImage: "chart.pie.fill")
+            Label("Limits of This Comparison", systemImage: "exclamationmark.triangle")
         }
     }
 
