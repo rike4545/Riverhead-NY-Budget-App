@@ -226,13 +226,20 @@ enum SeparationPay {
     /// records predate the Town reporting a group at all — but the largest
     /// payouts in the dataset sit here and are NOT unknown: they are department
     /// heads and appointed officials, who aren't union-covered by definition.
+    ///
+    /// Where the inference lands on the SAME real category the Town's own union
+    /// code already names — ELE for elected, APT for appointed board members —
+    /// return that code directly rather than a separate derived bucket. A blank
+    /// code doesn't make someone a different kind of person, and emitting both
+    /// produced two rows for what is really one group. Only "department head /
+    /// contractual" has no corresponding raw code, so it keeps its own bucket.
     private static func group(of row: PayrollRow) -> String {
         if let u = row.u?.trimmingCharacters(in: .whitespaces), !u.isEmpty { return u }
         let payClass = (row.c ?? "").trimmingCharacters(in: .whitespaces).lowercased()
         let title = (row.t ?? "").trimmingCharacters(in: .whitespaces).lowercased()
-        if payClass == "elected" || title == "town clerk" || title == "supervisor" { return "~elected" }
+        if payClass == "elected" || title == "town clerk" || title == "supervisor" { return "ELE" }
+        if title.hasPrefix("member of") { return "APT" }
         if payClass.contains("dept head") || payClass.contains("contractual") { return "~appointed" }
-        if title.hasPrefix("member of") { return "~appointed" }
         return "~unknown"
     }
 
@@ -245,7 +252,6 @@ enum SeparationPay {
         "APT": "Appointed board members",
         "CON": "Individual contract",
         "ELE": "Elected",
-        "~elected": "Elected — group inferred from pay class",
         "~appointed": "Department head / appointed — group inferred",
         "~unknown": "Group not recorded",
     ]
