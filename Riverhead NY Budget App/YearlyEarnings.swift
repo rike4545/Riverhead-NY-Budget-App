@@ -356,11 +356,6 @@ struct EmployeeDirectoryView: View {
                 .sheet(item: $quickLook) { emp in
                     EmployeeQuickLookView(employee: emp)
                 }
-                .toolbarBackground(
-                    RiverheadTheme.Surface.card.opacity(scheme == .dark ? 0.95 : 1.0),
-                    for: .navigationBar
-                )
-                .toolbarBackground(.visible, for: .navigationBar)
                 .onReceive(store.$isLoaded) { loaded in
                     if loaded { analytics.compute(from: store.employees) }
                 }
@@ -1081,11 +1076,6 @@ struct EmployeeDetailView: View {
         .background(RiverheadTheme.Surface.page.ignoresSafeArea())
         .ignoresSafeArea(edges: .top)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(
-            RiverheadTheme.Surface.card.opacity(scheme == .dark ? 0.95 : 1.0),
-            for: .navigationBar
-        )
-        .toolbarBackground(.visible, for: .navigationBar)
     }
 
     // MARK: Hero
@@ -1673,11 +1663,6 @@ struct WorkforceDashboardView: View {
         .background(RiverheadTheme.Surface.page.ignoresSafeArea())
         .navigationTitle("Workforce Analytics")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(
-            RiverheadTheme.Surface.card.opacity(scheme == .dark ? 0.95 : 1.0),
-            for: .navigationBar
-        )
-        .toolbarBackground(.visible, for: .navigationBar)
         .task {
             if !analytics.isReady && store.isLoaded {
                 analytics.compute(from: store.employees)

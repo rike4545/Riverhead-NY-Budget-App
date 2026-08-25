@@ -87,8 +87,6 @@ struct HistoricalTabView: View {
             .background(RiverheadTheme.Surface.page.ignoresSafeArea())
             .navigationTitle("Budget History")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(RiverheadTheme.Surface.card, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     filterMenu

@@ -99,11 +99,6 @@ struct RiverheadBudgetHubView: View {
         }
         .navigationTitle("Budget")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(
-            RiverheadTheme.Surface.card.opacity(scheme == .dark ? 0.95 : 1.0),
-            for: .navigationBar
-        )
-        .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
