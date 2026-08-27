@@ -2222,8 +2222,6 @@ struct CouncilScorecardView: View {
         .background(RiverheadTheme.backgroundGradient.ignoresSafeArea())
         .navigationTitle(displayName(for: member))
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(RiverheadTheme.Surface.card, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
     }
 
     @ViewBuilder

@@ -8,11 +8,15 @@
 //    - RBCivicToolkitStore   (ObservableObject → .environmentObject)
 //    - RBSixSigmaStore       (ObservableObject → .environmentObject)
 //
-//  Swift 6 • iOS 17+
+//  Swift 5 language mode • iOS 26+
+//
+//  Bars are deliberately left unstyled. On iOS 26 the system draws the tab bar
+//  and navigation bar in Liquid Glass; any UIKit appearance proxy set here would
+//  replace that material with a flat fill and the app would look like it had
+//  never been rebuilt. The previous version of this file did exactly that.
 //
 
 import SwiftUI
-import UIKit
 
 @MainActor
 struct MainTabView: View {
@@ -61,98 +65,40 @@ struct MainTabView: View {
     @State private var hasPreparedBudgetData = false
     @State private var isPreparingBudgetData = false
 
-    init() {
-        let tabAppearance = UITabBarAppearance()
-        tabAppearance.configureWithDefaultBackground()
-        tabAppearance.backgroundEffect = UIBlurEffect(style: .systemChromeMaterial)
-        tabAppearance.backgroundColor = UIColor { trait in
-            trait.userInterfaceStyle == .dark
-            ? UIColor(red: 0.055, green: 0.079, blue: 0.106, alpha: 0.94)
-            : UIColor(red: 0.920, green: 0.956, blue: 0.965, alpha: 0.94)
-        }
-        tabAppearance.shadowColor = UIColor.black.withAlphaComponent(0.10)
-        tabAppearance.stackedLayoutAppearance.selected.iconColor = UIColor(red: 0.098, green: 0.325, blue: 0.482, alpha: 1.0)
-        tabAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [
-            .foregroundColor: UIColor(red: 0.098, green: 0.325, blue: 0.482, alpha: 1.0)
-        ]
-        tabAppearance.stackedLayoutAppearance.normal.iconColor = UIColor { trait in
-            trait.userInterfaceStyle == .dark
-            ? UIColor(red: 0.553, green: 0.729, blue: 0.745, alpha: 0.70)
-            : UIColor(red: 0.306, green: 0.459, blue: 0.584, alpha: 0.70)
-        }
-        tabAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [
-            .foregroundColor: UIColor { trait in
-                trait.userInterfaceStyle == .dark
-                ? UIColor(red: 0.553, green: 0.729, blue: 0.745, alpha: 0.70)
-                : UIColor(red: 0.306, green: 0.459, blue: 0.584, alpha: 0.70)
-            }
-        ]
-        UITabBar.appearance().standardAppearance = tabAppearance
-        UITabBar.appearance().scrollEdgeAppearance = tabAppearance
-
-        let navAppearance = UINavigationBarAppearance()
-        navAppearance.configureWithDefaultBackground()
-        navAppearance.backgroundEffect = UIBlurEffect(style: .systemChromeMaterial)
-        navAppearance.backgroundColor = UIColor { trait in
-            trait.userInterfaceStyle == .dark
-            ? UIColor(red: 0.055, green: 0.079, blue: 0.106, alpha: 0.92)
-            : UIColor(red: 0.928, green: 0.958, blue: 0.966, alpha: 0.92)
-        }
-        navAppearance.shadowColor = UIColor.black.withAlphaComponent(0.08)
-        navAppearance.titleTextAttributes = [
-            .foregroundColor: UIColor(red: 0.098, green: 0.325, blue: 0.482, alpha: 1.0)
-        ]
-        navAppearance.largeTitleTextAttributes = [
-            .foregroundColor: UIColor(red: 0.098, green: 0.325, blue: 0.482, alpha: 1.0)
-        ]
-        UINavigationBar.appearance().standardAppearance = navAppearance
-        UINavigationBar.appearance().compactAppearance = navAppearance
-        UINavigationBar.appearance().scrollEdgeAppearance = navAppearance
-    }
-
     var body: some View {
         TabView(selection: selectedTab) {
-            NavigationStack {
-                HomeView()
+            Tab(AppTab.home.title, systemImage: AppTab.home.systemImage, value: AppTab.home) {
+                NavigationStack {
+                    HomeView()
+                }
             }
-            .tabItem {
-                Label(AppTab.home.title, systemImage: AppTab.home.systemImage)
-            }
-            .tag(AppTab.home)
 
-            NavigationStack {
-                RiverheadBudgetHubView()
+            Tab(AppTab.budget.title, systemImage: AppTab.budget.systemImage, value: AppTab.budget) {
+                NavigationStack {
+                    RiverheadBudgetHubView()
+                }
             }
-            .tabItem {
-                Label(AppTab.budget.title, systemImage: AppTab.budget.systemImage)
-            }
-            .tag(AppTab.budget)
 
-            NavigationStack {
-                CivicImprovementsHubView()
+            Tab(AppTab.discover.title, systemImage: AppTab.discover.systemImage, value: AppTab.discover) {
+                NavigationStack {
+                    CivicImprovementsHubView()
+                }
             }
-            .tabItem {
-                Label(AppTab.discover.title, systemImage: AppTab.discover.systemImage)
-            }
-            .tag(AppTab.discover)
 
-            NavigationStack {
-                CivicToolkitsHubView()
+            Tab(AppTab.toolkits.title, systemImage: AppTab.toolkits.systemImage, value: AppTab.toolkits) {
+                NavigationStack {
+                    CivicToolkitsHubView()
+                }
             }
-            .tabItem {
-                Label(AppTab.toolkits.title, systemImage: AppTab.toolkits.systemImage)
-            }
-            .tag(AppTab.toolkits)
 
-            NavigationStack {
-                MoreView()
+            Tab(AppTab.more.title, systemImage: AppTab.more.systemImage, value: AppTab.more) {
+                NavigationStack {
+                    MoreView()
+                }
             }
-            .tabItem {
-                Label(AppTab.more.title, systemImage: AppTab.more.systemImage)
-            }
-            .tag(AppTab.more)
         }
         .tint(RiverheadTheme.accent)
+        .tabBarMinimizeBehavior(.onScrollDown)
         .task {
             await prepareBudgetDataIfNeeded()
         }
@@ -171,22 +117,30 @@ struct MainTabView: View {
         )
     }
 
+    // A floating pill over scrolling content is exactly what Liquid Glass is for,
+    // so on iOS 26 it takes the real material instead of .ultraThinMaterial plus a
+    // hand-drawn border and shadow — glass supplies its own edge and shadow.
+    // Reduce Transparency still gets the flat card: glass is a translucency effect,
+    // and that setting exists to turn translucency off.
     private var startupBanner: some View {
-        Label("Loading budget data", systemImage: "arrow.trianglehead.2.clockwise")
+        let pill = Label("Loading budget data", systemImage: "arrow.trianglehead.2.clockwise")
             .font(.footnote.weight(.medium))
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
-            .background(
-                reduceTransparency
-                ? AnyShapeStyle(RiverheadTheme.Surface.card)
-                : AnyShapeStyle(.ultraThinMaterial),
-                in: Capsule()
-            )
-            .overlay(
-                Capsule()
-                    .strokeBorder(RiverheadTheme.softBorder, lineWidth: 1)
-            )
-            .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 4)
+
+        return Group {
+            if reduceTransparency {
+                pill
+                    .background(RiverheadTheme.Surface.card, in: Capsule())
+                    .overlay(
+                        Capsule()
+                            .strokeBorder(RiverheadTheme.softBorder, lineWidth: 1)
+                    )
+                    .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 4)
+            } else {
+                pill.glassEffect(.regular, in: Capsule())
+            }
+        }
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Loading budget data")
             .accessibilityHint("Budget data is warming up in the background.")
