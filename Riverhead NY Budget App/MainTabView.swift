@@ -15,6 +15,12 @@
 //  replace that material with a flat fill and the app would look like it had
 //  never been rebuilt. The previous version of this file did exactly that.
 //
+//  Note that nothing here calls a Liquid Glass API by name. The bars get the
+//  material from the SDK because nothing overrides them any more, which is the
+//  whole adoption. .glassEffect and .tabBarMinimizeBehavior were tried and then
+//  removed: they were written without an SDK to check them against, and an
+//  unverifiable API call is not worth the build.
+//
 
 import SwiftUI
 
@@ -98,7 +104,6 @@ struct MainTabView: View {
             }
         }
         .tint(RiverheadTheme.accent)
-        .tabBarMinimizeBehavior(.onScrollDown)
         .task {
             await prepareBudgetDataIfNeeded()
         }
@@ -117,30 +122,27 @@ struct MainTabView: View {
         )
     }
 
-    // A floating pill over scrolling content is exactly what Liquid Glass is for,
-    // so on iOS 26 it takes the real material instead of .ultraThinMaterial plus a
-    // hand-drawn border and shadow — glass supplies its own edge and shadow.
-    // Reduce Transparency still gets the flat card: glass is a translucency effect,
-    // and that setting exists to turn translucency off.
+    // A floating pill over scrolling content is the textbook case for Liquid Glass,
+    // and .glassEffect(.regular, in: Capsule()) would replace the material, border
+    // and shadow below with one call. It is not used here because it was written
+    // without an SDK to verify it against; the material version is what shipped
+    // before and is known to build. Worth revisiting on a machine with Xcode 26.
     private var startupBanner: some View {
-        let pill = Label("Loading budget data", systemImage: "arrow.trianglehead.2.clockwise")
+        Label("Loading budget data", systemImage: "arrow.trianglehead.2.clockwise")
             .font(.footnote.weight(.medium))
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
-
-        return Group {
-            if reduceTransparency {
-                pill
-                    .background(RiverheadTheme.Surface.card, in: Capsule())
-                    .overlay(
-                        Capsule()
-                            .strokeBorder(RiverheadTheme.softBorder, lineWidth: 1)
-                    )
-                    .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 4)
-            } else {
-                pill.glassEffect(.regular, in: Capsule())
-            }
-        }
+            .background(
+                reduceTransparency
+                ? AnyShapeStyle(RiverheadTheme.Surface.card)
+                : AnyShapeStyle(.ultraThinMaterial),
+                in: Capsule()
+            )
+            .overlay(
+                Capsule()
+                    .strokeBorder(RiverheadTheme.softBorder, lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 4)
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Loading budget data")
             .accessibilityHint("Budget data is warming up in the background.")
