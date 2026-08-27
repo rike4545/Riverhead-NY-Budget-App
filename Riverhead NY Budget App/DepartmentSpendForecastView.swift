@@ -305,15 +305,19 @@ final class DepartmentSpendForecastModel: ObservableObject {
         }
 
         #if DEBUG
-        let localCandidates = [
-            "/Users/bryan/Documents/Riverhead NY Budget App/Riverhead NY Budget App/Payroll_2026_app_ready.csv",
-            "/Users/bryan/Documents/macbook builds/Riverhead NY Budget App/Riverhead NY Budget App/Payroll_2026_app_ready.csv",
-            "/Users/bryan/Documents/Riverhead NY Budget App/Riverhead NY Budget App/salary_excerpt_2021_2026_app_ready_with_elected_officials_police_highway_2021_2026.csv",
-            "/Users/bryan/Documents/macbook builds/Riverhead NY Budget App/Riverhead NY Budget App/salary_excerpt_2021_2026_app_ready_with_elected_officials_police_highway_2021_2026.csv"
-        ]
+        // Debug-only fallback for running against the checkout when a resource has
+        // not made it into the bundle. The CSVs sit beside this source file, so the
+        // path is derived from #filePath — which the compiler fills in with wherever
+        // the source actually is on the machine doing the building. It previously
+        // listed four absolute paths under one developer's home directory, which
+        // meant it found nothing for anyone else and broke for them too the moment
+        // the folder moved. Deriving it also keeps the names from drifting: they
+        // come from the same two constants the bundle lookup above uses, instead of
+        // being spelled out a third time.
+        let sourceDirectory = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
 
-        for path in localCandidates {
-            let url = URL(fileURLWithPath: path)
+        for name in [primaryCSV, fallbackCSV] {
+            let url = sourceDirectory.appendingPathComponent("\(name).csv")
             if FileManager.default.fileExists(atPath: url.path) {
                 if load(url) { return }
             }
