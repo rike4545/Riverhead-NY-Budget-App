@@ -63,6 +63,16 @@ enum CommunityPreservationFundData {
     static let authorityBeganYear = 1999
     static let authorityExtendedYear = 2016
     static let authorityExpiresYear = 2050
+
+    // Where the Fund actually comes from. The CPF is not a General Municipal
+    // Law reserve fund — GML Article 2's reserve list does not reach it. It is
+    // its own statutory scheme, created for the five East End towns only.
+    static let enablingChapter = "Chapter 114 of the Laws of 1998, signed June 22, 1998"
+    static let enablingStatute = "Town Law \u{00A7} 64-e"
+    static let revenueStatute = "Tax Law Article 31-D"
+    static let eligibleTowns = "Riverhead, Southampton, East Hampton, Shelter Island and Southold"
+    static let authorityNote = "The Peconic Bay Region Community Preservation Fund was created by Chapter 114 of the Laws of 1998. Town Law \u{00A7} 64-e is the enabling statute that lets the five East End towns \u{2014} Riverhead, Southampton, East Hampton, Shelter Island and Southold \u{2014} establish the fund by local law, and Tax Law Article 31-D authorizes the real-estate transfer tax that pays for it. The scheme has been amended since: a 2016 act extended the authority through 2050 and added water-quality protection as an eligible use, and the 2021\u{2013}2022 Peconic Bay Region Community Housing Act authorized a separate community-housing fund alongside it. None of this runs through the General Municipal Law reserve-fund article."
+
     static let waterQualityCapPercent = 0.20
     static let lifetimeLandPurchases2025 = 76_983_250.00
     static let acresProtected = 2_280
@@ -127,6 +137,7 @@ struct CommunityPreservationFundView: View {
                     debtCard
                     debtPayoffCard
                     framingCard
+                    authorityCard
                     sourcesFooter
                 }
                 .padding(.horizontal, 16)
@@ -293,6 +304,43 @@ struct CommunityPreservationFundView: View {
                     .font(.caption)
                     .foregroundStyle(RiverheadTheme.textSecondary)
             }
+        }
+    }
+
+    private var authorityCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Where this Fund comes from", systemImage: "building.columns")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(RiverheadTheme.brandNavy)
+
+            Text(CommunityPreservationFundData.authorityNote)
+                .font(.footnote)
+                .foregroundStyle(RiverheadTheme.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            VStack(alignment: .leading, spacing: 4) {
+                authorityRow("Enacted by", CommunityPreservationFundData.enablingChapter)
+                authorityRow("Enabling statute", CommunityPreservationFundData.enablingStatute)
+                authorityRow("Revenue authority", CommunityPreservationFundData.revenueStatute)
+                authorityRow("Eligible towns", CommunityPreservationFundData.eligibleTowns)
+            }
+            .padding(.top, 2)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(RiverheadTheme.cardBackground, in: RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func authorityRow(_ label: String, _ value: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text(label)
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(RiverheadTheme.brandGold)
+                .frame(width: 108, alignment: .leading)
+            Text(value)
+                .font(.caption)
+                .foregroundStyle(RiverheadTheme.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 

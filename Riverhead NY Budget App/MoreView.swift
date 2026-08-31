@@ -387,6 +387,12 @@ struct MoreView: View {
             }
 
             NavigationLink {
+                PoliceStepScheduleView()
+            } label: {
+                Label("Police Pay Steps", systemImage: "stairs")
+            }
+
+            NavigationLink {
                 PluralityGovernanceView()
             } label: {
                 Label("Plurality & Oversight", systemImage: "person.3.sequence.fill")
@@ -455,6 +461,12 @@ struct MoreView: View {
                 RiverheadDebtSavingsView()
             } label: {
                 Label("Debt Savings View", systemImage: "building.columns.circle.fill")
+            }
+
+            NavigationLink {
+                CreditRatingView()
+            } label: {
+                Label("Credit Rating", systemImage: "star.circle.fill")
             }
 
             NavigationLink {

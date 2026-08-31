@@ -80,54 +80,77 @@ struct ReserveFundBreakdownView: View {
     private var unallocated: Double { max(0, unassigned - allocatedTotal) }
     private var overAllocated: Bool { allocatedTotal > unassigned }
 
+    // Corrected against the statute and the Comptroller's "Reserve Funds"
+    // guide. Three entries here were previously misattributed: §6-c is the
+    // CAPITAL reserve (not a rainy-day budget reserve), §6-e is CONTINGENCY AND
+    // TAX STABILIZATION (not machinery), and §6-g is the fire-district capital
+    // reserve, which a town cannot use.
+    //
+    // Deliberately NOT listed: the Town Law §55 General Reserve, §55-a
+    // improvement-district reserve and §55-b judgments-and-claims reserve.
+    // Those are open to "suburban towns" only. Every town in Suffolk County is
+    // a town of the SECOND class regardless of population (Town Law §10), and
+    // becoming a suburban town requires a public hearing plus a resolution
+    // subject to permissive referendum that also converts the town to the FIRST
+    // class (Town Law §50-a). Riverhead has not done that, so these three are
+    // unavailable to it. Source: OSC, "Information for Town Officials"
+    // (January 2026), Chapter 1.
     private let nyReserves: [NYReserveFundType] = [
         .init(
-            name: "Budget Reserve Fund",
-            citation: "Gen. Mun. Law §6-c",
-            purpose: "Accumulate funds to meet a budget deficiency or reduce a tax levy. The classic \"rainy day\" reserve — it must be established by local law or resolution, funded by surplus appropriations or levy, and can be drawn down by board resolution.",
-            withdrawalRule: "Board resolution required. May be used to fund a budget deficiency or offset a levy increase.",
-            interestRule: "Interest must be credited to the reserve fund, not the general fund.",
+            name: "Contingency and Tax Stabilization Reserve",
+            citation: "Gen. Mun. Law \u{00A7}6-e",
+            purpose: "The one written for Riverhead\u{2019}s actual problem. It funds unanticipated revenue losses and unanticipated expenditures, and it may be used to lessen or prevent a projected levy increase above 2\u{00BD}%. For a town the \u{201C}eligible portion\u{201D} is the town-wide general and highway funds \u{2014} about $77.0M for 2026, so the fund could hold up to roughly $7.7M.",
+            withdrawalRule: "Establishing it is a board resolution subject to permissive referendum. Spending from it takes a recommendation from the chief executive officer plus a two-thirds vote of the board.",
+            interestRule: "Hard ceiling of 10% of the eligible portion of the annual budget. If the balance is over that when the tentative budget is prepared, the excess MUST be applied to reduce next year\u{2019}s levy.",
+            tint: .purple
+        ),
+        .init(
+            name: "Employee Benefit Accrued Liability Reserve",
+            citation: "Gen. Mun. Law \u{00A7}6-p",
+            purpose: "Pays the cash value of accumulated sick, vacation, holiday and compensatory leave owed to employees when they separate from service. This matches Riverhead\u{2019}s largest workforce liability outside retiree health \u{2014} accrued leave stood at $11.6M at the end of 2025 and has risen every year since 2023.",
+            withdrawalRule: "Board resolution; no referendum to create or to spend. Cannot be used for a benefit already covered by another reserve.",
+            interestRule: "Interest credited to the reserve. Funded from budgetary appropriations or transfers from certain other reserves.",
+            tint: .orange
+        ),
+        .init(
+            name: "Retirement Contribution Reserve",
+            citation: "Gen. Mun. Law \u{00A7}6-r",
+            purpose: "Smooths pension-cost volatility. Strictly for employer contributions to the State retirement systems \u{2014} NYSLRS and the Police and Fire Retirement System. Riverhead\u{2019}s net pension liability moved from $21.4M to $27.3M in a single year on investment returns alone.",
+            withdrawalRule: "Board resolution; no referendum. Only for employer retirement-system contributions \u{2014} this reserve has nothing to do with retiree health.",
+            interestRule: "Interest credited to the reserve. Several other reserves may transfer unexpended balances here, subject to a public hearing on 15 days\u{2019} notice.",
+            tint: .red
+        ),
+        .init(
+            name: "Capital Reserve Fund",
+            citation: "Gen. Mun. Law \u{00A7}6-c",
+            purpose: "Finances construction, reconstruction or acquisition of a capital improvement or item of equipment. Can be written for a named project (\u{201C}specific\u{201D}) or a category such as highway equipment (\u{201C}type\u{201D}).",
+            withdrawalRule: "For a town, establishing a SPECIFIC capital reserve is subject to permissive referendum unless the item\u{2019}s period of probable usefulness is under five years; spending from it then needs only a board resolution. A TYPE reserve is the mirror image \u{2014} no referendum to establish, but the expenditure is subject to permissive referendum.",
+            interestRule: "Interest follows the principal. Residual balances after a project completes may be moved to another capital reserve without referendum.",
             tint: .blue
         ),
         .init(
             name: "Repair Reserve Fund",
-            citation: "Gen. Mun. Law §6-d",
-            purpose: "Set aside money for repairs to capital improvements (roads, buildings, infrastructure). Useful when a town knows maintenance costs will spike in a future year.",
-            withdrawalRule: "Board resolution required; must be for repair or reconstruction of capital improvements.",
-            interestRule: "Interest credited to reserve. Withdrawals for any unauthorized purpose require a permissive referendum.",
-            tint: .orange
+            citation: "Gen. Mun. Law \u{00A7}6-d",
+            purpose: "Pays for repairs to capital improvements or equipment of a kind that does NOT recur annually or more often. Routine yearly maintenance does not qualify.",
+            withdrawalRule: "No referendum to establish or spend, but a resolution appropriating money from it requires a public hearing with at least five days\u{2019} notice. In an emergency the board can skip the hearing on a two-thirds vote \u{2014} then half must be repaid the next fiscal year and the rest the year after.",
+            interestRule: "Interest credited to the reserve. Balances may be transferred to a capital reserve or a contingency and tax stabilization reserve.",
+            tint: .teal
         ),
         .init(
-            name: "Machinery Reserve Fund",
-            citation: "Gen. Mun. Law §6-e",
-            purpose: "Accumulate funds to purchase or replace machinery and equipment. Particularly useful for highway departments and public works fleets.",
-            withdrawalRule: "Board resolution; must be for purchase of machinery, apparatus, or equipment.",
-            interestRule: "Interest stays in the reserve. Cannot exceed actual cost of replacement.",
-            tint: .green
-        ),
-        .init(
-            name: "Capital Reserve Fund",
-            citation: "Gen. Mun. Law §6-g",
-            purpose: "Accumulate money for a specific capital improvement or class of capital improvements. Must have a defined purpose and an authorized maximum amount.",
-            withdrawalRule: "Board resolution; must match the stated capital purpose. Excess after project completion may require permissive referendum to redirect.",
-            interestRule: "All interest credited to the reserve. No withdrawal for operating expenses.",
-            tint: .purple
-        ),
-        .init(
-            name: "Retirement Contribution Reserve",
-            citation: "Gen. Mun. Law §6-r",
-            purpose: "Smooth out pension-cost volatility. Contributions can be made in flush years and drawn down when NYSLRS rates spike. OSC recommends municipalities with large pension exposure maintain one.",
-            withdrawalRule: "Only for employer retirement system contributions. Board resolution required.",
-            interestRule: "Interest credited to reserve. OSC recommends documenting a funding policy.",
-            tint: .red
+            name: "Reserve Fund for Payment of Bonded Indebtedness",
+            citation: "Gen. Mun. Law \u{00A7}6-h",
+            purpose: "Pays principal and interest on, or buys back, the Town\u{2019}s own bonds \u{2014} limited to issues with a maximum maturity of at least five years. It cannot be used for debt payable from assessments or from taxes on an area smaller than the whole town.",
+            withdrawalRule: "Board resolution; no referendum to establish or to spend. If the current budget already funds that debt service from another source, the reserve may not also be used for it this year.",
+            interestRule: "Interest follows the principal. Transferring the balance out to a capital reserve is subject to permissive referendum.",
+            tint: .indigo
         ),
         .init(
             name: "Insurance Reserve Fund",
-            citation: "Gen. Mun. Law §6-n",
-            purpose: "Fund self-insurance programs (workers' comp, unemployment, tort liability). Must be formally established if the municipality self-insures any risk category.",
-            withdrawalRule: "May only be used for the specified self-insurance purpose. Board resolution required.",
-            interestRule: "Interest stays in reserve. Annual actuarial review is prudent.",
-            tint: .teal
+            citation: "Gen. Mun. Law \u{00A7}6-n",
+            purpose: "Funds uninsured losses, claims, actions or judgments, plus the professional services used to investigate and settle them. A long list of coverages is excluded \u{2014} life, health, workers\u{2019} compensation, fidelity and surety, title and several others.",
+            withdrawalRule: "Board resolution; no referendum. Settlements paid from it are capped at $25,000 each where compromised or settled with judicial approval.",
+            interestRule: "Annual contributions are capped at the greater of $33,000 or 5% of the total budget, though there is no ceiling on the balance itself. A separate account must be kept for each kind of risk.",
+            tint: .mint
         ),
     ]
 
@@ -199,8 +222,8 @@ struct ReserveFundBreakdownView: View {
                     name: "Nonspendable",
                     color: .gray,
                     definition: "Amounts that cannot be spent — inventory, prepaid items, long-term receivables, permanent-fund corpus.",
-                    riverheadContext: "Riverhead's General Fund likely carries minimal nonspendable balance. Specific amounts appear in the audited GAAP financial statements.",
-                    amount: nil
+                    riverheadContext: "Reported at $2,012,534.08 in the General Fund at December 31, 2025 \u{2014} prepaid items and similar assets that exist but cannot be spent.",
+                    amount: 2_012_534.08
                 )
                 Divider().opacity(0.2)
                 tier54Row(
@@ -208,8 +231,8 @@ struct ReserveFundBreakdownView: View {
                     name: "Restricted",
                     color: .red,
                     definition: "Constrained by external parties: state law, federal grants, bond covenants, or creditors.",
-                    riverheadContext: "Formally established reserve funds (§6-c, §6-d, §6-e, etc.) sit here once adopted by resolution. Special district surpluses held in separate funds also appear here.",
-                    amount: nil
+                    riverheadContext: "Just $17,924.16 at the end of 2025, and all of it opioid-settlement money, which may only be spent on the purposes that settlement allows. Formally established reserve funds would also sit here once adopted \u{2014} Riverhead has essentially none, which is why this tier is so small.",
+                    amount: 17_924.16
                 )
                 Divider().opacity(0.2)
                 tier54Row(
@@ -217,8 +240,8 @@ struct ReserveFundBreakdownView: View {
                     name: "Committed",
                     color: .orange,
                     definition: "Self-imposed constraints set by the highest level of decision-making (Town Board resolution or local law). Can only be released by the same Board action.",
-                    riverheadContext: "A Town Board resolution dedicating a portion of fund balance for a specific future capital project or pension buffer would be classified here.",
-                    amount: nil
+                    riverheadContext: "$42,435 at the end of 2025, up from $22,005 a year earlier. Committed balance takes a formal Board action to create, and the same level of action to release.",
+                    amount: 42_435.00
                 )
                 Divider().opacity(0.2)
                 tier54Row(
@@ -226,8 +249,8 @@ struct ReserveFundBreakdownView: View {
                     name: "Assigned",
                     color: .yellow,
                     definition: "Amounts the Board intends to use for a specific purpose but has not formally committed. An adopted budget that appropriates fund balance moves it here.",
-                    riverheadContext: "The 2026 adopted budget's appropriated fund balance use would normally be classified as assigned. Any amount earmarked by resolution for a named project without a formal reserve fund also lands here.",
-                    amount: nil
+                    riverheadContext: "$1,663,273.34 at the end of 2025 \u{2014} $1,250,000 of it the fund balance appropriated into the 2026 budget, and $413,273.34 assigned but unappropriated.",
+                    amount: 1_663_273.34
                 )
                 Divider().opacity(0.2)
                 tier54Row(

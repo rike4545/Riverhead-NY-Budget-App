@@ -9,7 +9,7 @@
 //
 //  Headline dollar figures come from RBBudgetStore so they stay consistent with
 //  the rest of the app and the AI assistant. The year-over-year and cost-driver
-//  figures are the 2026 Tentative Budget values already cited in the app.
+//  figures are the 2026 Adopted Budget values already cited in the app.
 //
 //  Swift 6 · iOS 17+
 //
@@ -21,10 +21,10 @@ struct ResidentBudgetSnapshot: View {
     @Environment(RBBudgetStore.self) private var store
     @Environment(\.colorScheme) private var scheme
 
-    // 2025 adopted total, for the year-over-year comparison (2026 Tentative Budget).
+    // 2025 adopted total, for the year-over-year comparison (2026 Adopted Budget).
     private let priorYearTotal: Double = 64_895_000
 
-    // The biggest drivers of the 2026 increase, in dollars (2026 Tentative Budget).
+    // The biggest drivers of the 2026 increase, in dollars (2026 Adopted Budget).
     private struct Driver: Identifiable {
         let id = UUID()
         let label: String

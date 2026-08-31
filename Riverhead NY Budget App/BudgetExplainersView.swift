@@ -206,7 +206,7 @@ struct BudgetExplainersView: View {
                     .init(label: "Board vote", systemImage: "person.3.fill", tint: RiverheadTheme.brandSky),
                     .init(label: "Public reason", systemImage: "quote.bubble.fill", tint: RiverheadTheme.gold)
                 ],
-                whyItMatters: "The public question is not just whether an override happens. It is whether the Town shows a cap-compliant baseline, clear findings, and a path back to stability. Riverhead has adopted overrides in 2023, 2024, and 2026, and on current trends the 2027 levy pierces the cap by about $2.62M — so this is a live question, not a hypothetical.",
+                whyItMatters: "The public question is not just whether an override happens. It is whether the Town shows a cap-compliant baseline, clear findings, and a path back to stability. Riverhead has adopted overrides in 2023, 2024, and 2026, and on current trends the 2027 levy pierces the cap by about $2.76M — so this is a live question, not a hypothetical.",
                 practicalQuestion: "What would the budget look like under the cap, and what exactly does an override fund? (The 2027 Spending Reduction deep dive below works this out line by line.)",
                 authority: "General Municipal Law §3-c (enacted 2011, effective for fiscal years beginning 2012)"
             ),
@@ -582,7 +582,7 @@ struct BudgetExplainersView: View {
             } label: {
                 deepDiveCard(
                     title: "The 2027 Tax Cap Gap, Worked Out",
-                    subtitle: "“What would the budget look like under the cap?” — answered: the levy pierces it by about $2.62M, and here is what closes the gap without an override.",
+                    subtitle: "“What would the budget look like under the cap?” — answered: the levy pierces it by about $2.76M, and here is what closes the gap without an override.",
                     systemImage: "chart.line.downtrend.xyaxis",
                     accent: RiverheadTheme.brandMint
                 )

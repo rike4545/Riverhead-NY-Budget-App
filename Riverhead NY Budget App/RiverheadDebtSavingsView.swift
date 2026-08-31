@@ -55,14 +55,14 @@ struct RiverheadDebtSavingsView: View {
             ),
             .init(
                 title: "Debt limit used",
-                value: "3.78%",
-                note: "From the 2023 audit, the last year this disclosure is available. Capacity is not the same as affordability.",
+                value: "6.74%",
+                note: "From the 2024 audit, the newest year this disclosure was filed. Capacity is not the same as affordability.",
                 tint: RiverheadTheme.brandMint
             ),
             .init(
                 title: "General Fund cushion",
                 value: "$33.41M",
-                note: "Total General Fund balance at year-end 2025.",
+                note: "Total General Fund balance at December 31, 2025, per the 2025 Annual Financial Report.",
                 tint: RiverheadTheme.brandGold
             )
         ]
@@ -401,7 +401,7 @@ struct RiverheadDebtSavingsView: View {
             Text("Source Note")
                 .font(.headline)
 
-            Text("Debt figures are based on the Statement of Indebtedness in Riverhead's 2025 Annual Financial Report (filed with the NY State Comptroller): $38,423,858 bonded debt excluding BANs and premiums, $21,975,000 in BANs, $60,398,858 total including BANs. The debt-limit-exhausted figure (3.78%) is from the 2023 Audited Basic Financial Statement's Management's Discussion and Analysis — the last year that disclosure was filed — so it predates the debt totals above by two years. The General Fund cushion figure is confirmed from the 2025 report's General Fund balance sheet ($33,407,251 total fund balance at 12/31/2025). Policy framing is based on GASB debt and OPEB disclosure concepts, GASB 54-style fund-balance discipline, and GFOA debt-management and capital-planning best practices.")
+            Text("Debt figures are based on the Statement of Indebtedness in Riverhead's 2025 Annual Financial Report (filed with the NY State Comptroller): $38,423,858 bonded debt excluding BANs and premiums, $21,975,000 in BANs, $60,398,858 total including BANs. The debt-limit-exhausted figure (6.74%) is from the 2024 Audited Basic Financial Statement's Management's Discussion and Analysis — the newest year that disclosure was filed — so it predates the debt totals above by one year. The 2023 audit's 3.78% is not a comparable prior reading: that aggregate counted bonds only, while the 2024 figure counts the two bond anticipation notes as well, so the basis changed rather than the borrowing. The General Fund cushion figure is confirmed from the 2025 report's General Fund balance sheet ($33,407,251 total fund balance at 12/31/2025). Policy framing is based on GASB debt and OPEB disclosure concepts, GASB 54-style fund-balance discipline, and GFOA debt-management and capital-planning best practices.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

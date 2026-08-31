@@ -48,22 +48,22 @@ struct OffBalanceLiabilitiesView: View {
             .init(
                 title: "OPEB",
                 basis: "GASB 75 retiree health",
-                amount: "$152,597,117",
-                share: "87%",
+                amount: "$132,417,187",
+                share: "85.4%",
                 color: RiverheadTheme.brandCoral
             ),
             .init(
                 title: "PFRS",
                 basis: "GASB 68 police/fire pension",
                 amount: "$15,905,643",
-                share: "9%",
+                share: "10.3%",
                 color: RiverheadTheme.brandSky
             ),
             .init(
                 title: "ERS",
                 basis: "GASB 68 pension",
                 amount: "$6,650,744",
-                share: "4%",
+                share: "4.3%",
                 color: RiverheadTheme.brandMint
             )
         ]
@@ -75,8 +75,8 @@ struct OffBalanceLiabilitiesView: View {
                 title: "Retiree health and other post-employment benefits",
                 level: .high,
                 icon: "cross.case.fill",
-                whereToLook: "2023 audited financial statements, GASB 75 OPEB actuarial notes, health-insurance trend assumptions, and retiree census changes.",
-                whyItCanHide: "The yearly budget often shows only current benefit payments, while the longer retiree-health promise sits in audit disclosures and actuarial schedules. Riverhead's 2023 audit shows OPEB at $152.6M, about 87% of the combined OPEB and pension liability snapshot. The Town paid $3.55M in 2023 for 211 retirees' health coverage — about $17,000 each — while 306 employees were still active.",
+                whereToLook: "2024 audited financial statements, GASB 75 OPEB actuarial notes, the Annual Financial Report's Schedule W, health-insurance trend assumptions, and retiree census changes.",
+                whyItCanHide: "The yearly budget often shows only current benefit payments, while the longer retiree-health promise sits in audit disclosures and actuarial schedules. Riverhead's 2024 audit shows OPEB at $132.4M, about 85% of the combined OPEB and pension liability snapshot. As of the 2025 Annual Financial Report the Town was paying benefits for 230 retirees alongside 333 full-time active employees — so the promise keeps accruing while the budget shows only this year's premiums.",
                 budgetTrigger: "Health-insurance premiums rise faster than the levy, retiree counts climb, or contribution assumptions change.",
                 question: "What is the latest actuarial liability, and how much of the annual cost is being deferred?"
             ),
@@ -202,12 +202,12 @@ struct OffBalanceLiabilitiesView: View {
 
     private var auditedSnapshot: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Label("2023 Audit Snapshot", systemImage: "checkmark.seal.fill")
+            Label("2024 Audit Snapshot", systemImage: "checkmark.seal.fill")
                 .font(.headline)
                 .foregroundStyle(RiverheadTheme.brandNavy)
 
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text("$175,153,504")
+                Text("$154,973,574")
                     .font(.system(.largeTitle, design: .rounded).weight(.bold))
                     .foregroundStyle(RiverheadTheme.brandNavy)
                     .minimumScaleFactor(0.72)
@@ -219,7 +219,7 @@ struct OffBalanceLiabilitiesView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            Text("Verified as of December 31, 2023 in the Town's audited financial statements (the most recent audit available). OPEB is the dominant exposure because retiree healthcare is typically handled on a pay-as-you-go basis rather than through a funded investment trust like NYSLRS.")
+            Text("Verified as of December 31, 2024 in the Town's audited financial statements — the most recent audit available, and the newest source that reports all three of these on one basis. OPEB is the dominant exposure because retiree healthcare is handled on a pay-as-you-go basis rather than through a funded investment trust like NYSLRS. Newer still, the 2025 Annual Financial Report puts the OPEB figure at $129,479,192, but that is the governmental-activities share only — it leaves out water and sewer, so it is not comparable to the all-activities total shown here.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

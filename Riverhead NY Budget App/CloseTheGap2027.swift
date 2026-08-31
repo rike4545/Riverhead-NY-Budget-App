@@ -9,7 +9,7 @@
 //  Two different "gaps" appear in the 2027 planning views and they measure
 //  different things:
 //    • payroll-pressure gap ($936,727) — the recurring cost of standing still.
-//    • cap-piercing gap    ($2,619,382) — how far the projected 2027 levy
+//    • cap-piercing gap    ($2,757,133) — how far the projected 2027 levy
 //      overshoots what NY's 2% property-tax cap allows. This is the number that
 //      forces a political decision.
 //
@@ -20,11 +20,91 @@ import Foundation
 
 enum CloseTheGap2027 {
     // From the 2027 prediction model (budget-2027-prediction.json capGap).
-    static let capPiercingGap: Double = 2_619_382
+    // Regenerated after the Personal Services rate moved from one flat 3.5% to a
+    // payroll-weighted blend of each bargaining unit's own 2027 terms — see
+    // `unionBreakdown` below. The gap widened from $2,619,382 to $2,757,133.
+    static let capPiercingGap: Double = 2_757_133
     static let allowedLevy: Double = 66_650_818
-    static let predictedLevy: Double = 69_270_200
-    static let predictedLevyPct: Double = 6.0
+    static let predictedLevy: Double = 69_407_951
+    static let predictedLevyPct: Double = 6.2
     static let capBasePct: Double = 2
+
+    /// The real ceiling is a little higher than a flat 2% once the tax-base-growth
+    /// factor and the exclusions below are added, which shrinks the gap somewhat.
+    static let capGapCaveat = "The real ceiling is a bit higher than a flat 2% once the tax-base-growth factor and exclusions are added, which would shrink the gap somewhat."
+
+    // MARK: - How the Personal Services rate is built
+
+    /// Each bargaining unit's own 2027 rate, weighted by its share of 2025 actual
+    /// Town payroll — replacing the single flat 3.5% the model used before.
+    struct UnionRate: Identifiable {
+        let union: String
+        let payrollSharePct: Double
+        let ratePct: Double
+        /// False when the contract expires 12/31/2026 with no successor public —
+        /// the rate shown is that unit's own trailing average, used as a placeholder.
+        let known2027: Bool
+        let term: String?
+        let source: String
+        var id: String { union }
+    }
+
+    static let blendedPersonalServicesRatePct: Double = 3.84
+
+    static let unionBreakdownNote = "How the Personal Services rate (3.84%/yr) is built: each bargaining unit's own 2027 rate, weighted by its share of 2025 actual Town payroll."
+
+    static let unionBreakdown: [UnionRate] = [
+        .init(
+            union: "CSEA",
+            payrollSharePct: 36.8,
+            ratePct: 4.57,
+            known2027: true,
+            term: "2026–2029 CBA",
+            source: "Fully executed 2026–2029 CSEA Agreement, Article 15(2) (Wages), signed 12/6/2025. Each year is a step % PLUS a flat, non-recurring dollar add-on that compounds into later years' base (2%+$1,500 in 2026, 2.5%+$1,000 in 2027, 3%+$500 in 2028, 3.5% in 2029) — converted here to an effective % using 2025 actual average CSEA base pay ($45,811), so the flat dollars are properly weighted rather than ignored."
+        ),
+        .init(
+            union: "PBA",
+            payrollSharePct: 36.7,
+            ratePct: 3.36,
+            known2027: false,
+            term: "2023–2026 MOA (expires 12/31/2026, no successor yet public)",
+            source: "Signed PBA MOA, Article XXXVII (Salaries), 7/25/2023. Full known PBA history back to 2016 (2%/2%/1.5%/1.5% in 2017–2020, 2%/2% in the 2021–2022 COVID extension per Town Board Resolution 2020-519) confirms the contracts are continuous with no gap — but the placeholder still uses only the most recent 2023–2026 contract, as the closer starting point for the next negotiation."
+        ),
+        .init(
+            union: "SOA",
+            payrollSharePct: 8.5,
+            ratePct: 4.49,
+            known2027: false,
+            term: "2023–2026 agreement (expires 12/31/2026, no successor yet public)",
+            source: "Signed SOA MOA, Article XXXII (Salaries), 12/12/2023. Full known SOA history back to 2016 (2%/2%/2%/2%/1.5% in 2016–2020, 2%/2% in the 2021–2022 COVID extension per Town Board Resolution 2020-520) confirms the contracts are continuous with no gap — but the placeholder still uses only the most recent 2023–2026 contract, as the closer starting point for the next negotiation."
+        ),
+        .init(
+            union: "Non-union / other",
+            payrollSharePct: 17.9,
+            ratePct: 3.0,
+            known2027: false,
+            term: nil,
+            source: "Management-confidential, elected, temporary, and unspecified positions. No CBA covers these positions; a general 3.0% trend assumption is used."
+        ),
+    ]
+
+    static let unionBreakdownEstimateNote = "“Est.” means that union's contract expires 12/31/2026 with no successor yet public — the rate shown is that union's own trailing average annual raise from its just-completed contract, used as a placeholder."
+
+    // MARK: - Pension exclusion from the tax cap
+
+    /// New York's cap allows a municipality to exclude the portion of a pension
+    /// contribution-rate rise above 2 percentage points. Only PFRS clears that
+    /// threshold for SFY 2026-27; ERS does not.
+    enum PensionExclusion {
+        static let totalEstimate: Double = 137_642
+        static let pfrsRateIncreasePts: Double = 2.8
+        static let ersRateIncreasePts: Double = 1.1
+        static let pfrsExcessPts: Double = 0.8
+        static let pfrsExclusionEstimate: Double = 137_642
+        static let ersExclusionEstimate: Double = 0
+        static let payrollYear = 2025
+        static let source = "OSC, “NYSLRS Announces Employer Contribution Rates for SFY 2026-27” (9/2025): ERS 16.5%→17.6% (+1.1 pts, no exclusion — under the 2-pt threshold); PFRS 33.7%→36.5% (+2.8 pts, 0.8 pts over the threshold, so a real exclusion applies). Estimate uses actual PBA+SOA payroll as a stand-in for the state's “estimated salary base” — the Town's own ERS/PFRS billing detail would be more precise."
+    }
 
     struct RetirementUnit: Identifiable {
         let unit: String
@@ -93,7 +173,7 @@ enum CloseTheGap2027 {
             name: "Use a modest, disclosed one-time fund-balance appropriation for the residual only",
             closes: "whatever gap remains after the recurring measures above",
             standing: .oneTime,
-            politics: "An easy vote — it raises no tax and cuts no service — but it spends one-time money on recurring cost, so it can only bridge a transitional remainder. Appropriating the full $2.62M would burn ~8.8% of the $29.7M unassigned fund balance — the truly flexible cushion — for something that recurs."
+            politics: "An easy vote — it raises no tax and cuts no service — but it spends one-time money on recurring cost, so it can only bridge a transitional remainder. Appropriating the full $2.76M would burn ~9.3% of the $29.7M unassigned fund balance — the truly flexible cushion — for something that recurs."
         ),
         .init(
             name: "If the Board still wants the spending, override the cap — deliberately and in public",

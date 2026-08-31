@@ -685,7 +685,11 @@ fileprivate enum BudgetRecommendations2027 {
     // General Fund balance ($29,671,084.17), the newest year-end figure available.
     static let modeledUnassignedFundBalance2026 = 29_671_084.00
     static let cpfOutstandingDebt2024 = 12_290_000.00
-    static let cpfAccelerationPayment = 2_000_000.00
+    /// The General Fund's share of the July 2026 CPF debt paydown. The paydown
+    /// itself was funded from CPF fund balance (~$7.2M), which is a separate
+    /// fund; only this sliver came from General Fund balance, because a small
+    /// part of the same 2018 bond series is tied to the General Fund.
+    static let cpfAccelerationPayment = 92_000.00
 
     static let modeledEligibleHealthcarePositions = Budget2027TaxCapOffsetModel.modeledEligibleHealthcarePositions
     static let nyshipPlanPrimeIndividualMonthlyPremium = Budget2027TaxCapOffsetModel.nyshipPlanPrimeIndividualMonthlyPremium
@@ -767,9 +771,9 @@ fileprivate enum BudgetRecommendations2027 {
             detail: "Adopt a Brookhaven-style operating-budget trigger so Town-Wide General Fund spending does not rise faster than the three-year average of revenue growth plus the three-year average population growth rate, unless the Town Board makes a supermajority finding to exceed it."
         ),
         .init(
-            title: "Use excess fund balance to cut CPF principal and interest",
+            title: "CPF debt retired early \u{2014} now finish the cash-receipt controls",
             impact: "Fairness",
-            detail: "Riverhead should use a portion of excess fund balance above its operating target to make a one-time CPF principal reduction and lower future interest cost. RiverheadLOCAL reported on March 5, 2026 that the Town took in about $7.03M of CPF revenue in 2025, more than $110M over the life of the program, and still had about $12.29M of CPF debt outstanding as of December 31, 2024. The debt is still scheduled to run through 2030, with nearly $3M a year now going to principal and interest before falling below $2M by 2028. OSC's February 2024 CPF audit also found Riverhead's CPF disbursements and debt service were proper and supported, while the weakness was on collection logging and deposit timing. That makes CPF debt reduction a strong use of one-time surplus so long as the Town also tightens cash-receipt controls."
+            detail: "This one has largely happened. On July 7, 2026 the Board adopted Resolution 2026-642 unanimously, retiring the remaining CPF land-preservation debt five years ahead of its 2030 maturity and saving roughly $660,000 in future interest. Worth being precise about where the money came from: about $7.2M of the CPF\u{2019}s own fund balance, on top of the $2.75M already budgeted for the year\u{2019}s debt service \u{2014} not General Fund surplus, which contributed only about $92,000 for the slice of the 2018 series tied to the General Fund. The CPF was left holding roughly $20.1M. What is NOT resolved is the other half of the picture: OSC\u{2019}s February 2024 CPF audit found disbursements and debt service proper and supported, but flagged collection logging and deposit timing. Retiring the debt did nothing about that, and it remains the live recommendation."
         ),
         .init(
             title: "Create a Community Housing Fund Advisory Board",
@@ -870,9 +874,9 @@ fileprivate enum BudgetRecommendations2027 {
             detail: "Codify an operating-budget rule stating that Town-Wide General Fund expenditures should not increase from the most recent adopted budget by more than the three-year average of revenue growth plus the three-year average population growth rate for the prior completed fiscal years. If the computed rate is below zero, baseline spending growth should default to zero unless a three-fourths Town Board vote authorizes a higher increase."
         ),
         .init(
-            title: "Use excess fund balance for a larger CPF principal payment",
+            title: "CPF principal paydown \u{2014} completed July 2026",
             impact: "Fairness",
-            detail: "The Town borrowed about $70M against future 2% CPF receipts in the early 2000s and restructured that obligation through a 2016 refunding. RiverheadLOCAL reported on March 5, 2026 that Riverhead generated about $7.03M in CPF revenue during 2025 and still had about $12.29M outstanding as of December 31, 2024. The remaining schedule still runs through 2030, with annual principal and interest near $3M before dropping below $2M by 2028. A one-time paydown from excess fund balance would directly reduce CPF principal, future interest, and financing drag on CPF cash flow."
+            detail: "The Town borrowed about $70M against future 2% CPF receipts in the early 2000s and restructured that obligation through a 2016 refunding. That story is now closed: on July 7, 2026 the Board voted 5\u{2013}0 (Resolution 2026-642) to retire the remaining balance five years early, ahead of the 2030 final maturity, saving about $660,000 in interest. The paydown used roughly $7.2M of CPF fund balance plus the $2.75M already budgeted for the year, and about $92,000 of General Fund balance for the portion of the same bond series carried by the General Fund. Riverhead collected about $7M of CPF transfer-tax revenue in 2025, and the fund still held roughly $20.1M afterward."
         ),
         .init(
             title: "Constitute a Community Housing Fund Advisory Board",
@@ -1576,10 +1580,10 @@ fileprivate struct ExecutiveBudgetSummaryView: View {
 
     private var sourceLinks: [BudgetSourceLink] {
         [
-            .init(title: "2026 Tentative Budget",
+            .init(title: "2026 Adopted Budget",
                   kind: .budgetBook,
                   note: nil,
-                  url: URL(string: "https://www.townofriverheadny.gov/DocumentCenter/View/2779/2026-Tentative-Budget-PDF")),
+                  url: URL(string: "https://www.townofriverheadny.gov/DocumentCenter/View/2967/2026-Adopted-Budget")),
             .init(title: "2026 Budget Supplement",
                   kind: .budgetBook,
                   note: nil,
@@ -2304,7 +2308,7 @@ fileprivate struct OverviewStoryView: View {
             } else {
                 GlassCard(
                     title: "Budget story at a glance",
-                    subtitle: "Key fiscal metrics for the 2026 Tentative Budget. Tap a section chip above to drill deeper."
+                    subtitle: "Key fiscal metrics for the 2026 Adopted Budget. Tap a section chip above to drill deeper."
                 ) {
                     VStack(alignment: .leading, spacing: 8) {
                         ForEach(cards) { card in
@@ -2315,10 +2319,10 @@ fileprivate struct OverviewStoryView: View {
             }
 
             SourcesStrip(links: [
-                .init(title: "2026 Tentative Budget",
+                .init(title: "2026 Adopted Budget",
                       kind: .budgetBook,
                       note: nil,
-                      url: URL(string: "https://www.townofriverheadny.gov/DocumentCenter/View/2779/2026-Tentative-Budget-PDF")),
+                      url: URL(string: "https://www.townofriverheadny.gov/DocumentCenter/View/2967/2026-Adopted-Budget")),
                 .init(title: "2026 Budget Supplement",
                       kind: .budgetBook,
                       note: nil,
@@ -2531,10 +2535,10 @@ fileprivate struct MyTaxesLabView: View {
             }
 
             SourcesStrip(links: [
-                .init(title: "2026 Tentative Budget – Tax Cap section",
+                .init(title: "2026 Adopted Budget – Tax Cap section",
                       kind: .budgetBook,
                       note: nil,
-                      url: URL(string: "https://www.townofriverheadny.gov/DocumentCenter/View/2779/2026-Tentative-Budget-PDF"))
+                      url: URL(string: "https://www.townofriverheadny.gov/DocumentCenter/View/2967/2026-Adopted-Budget"))
             ])
         }
     }
@@ -2606,7 +2610,7 @@ fileprivate struct FundBalanceDashboardView: View {
 
     private let targetReservePercent = 0.288
 
-    // Real 2026 Tentative Budget figures from RBBudgetStore.
+    // Real 2026 Adopted Budget figures from RBBudgetStore.
     // General Fund: appropriations $69,113,159 · estimated unassigned fund balance $29,671,084.
     // Policy: 15% minimum, 20% upper target.
     private var snapshots: [FundBalanceSnapshot] {
@@ -2647,29 +2651,59 @@ fileprivate struct FundBalanceDashboardView: View {
             ),
             .init(
                 number: 4,
-                title: "Use excess fund balance for CPF debt reduction",
-                amount: BudgetRecommendations2027.cpfAccelerationPayment,
-                detail: "Riverhead's CPF debt began as roughly $70M borrowed against future fund revenue, was refunded in 2016, and RiverheadLOCAL reported about $12.29M still outstanding as of December 31, 2024. Using some excess fund balance for a one-time CPF principal payment should lower future interest cost and shorten the payoff path."
+                title: "Start funding the accrued-leave reserve",
+                amount: 1_834_915,
+                detail: "Accrued leave owed to employees grew from $9,773,700 to $11,608,615 during 2025 \u{2014} $1,834,915 in one year, none of it set aside. General Municipal Law \u{00A7} 6-p lets the Board create an Employee Benefit Accrued Liability Reserve by resolution and put one-time money into it. Funding one year's growth will not retire the liability, which is larger than the whole deployable surplus, but it stops the unfunded gap widening while the 2026 retirement incentive converts part of it to cash. Because this transfer is not already in the adopted budget, the Comptroller\u{2019}s guidance is that it takes a board resolution stating the amount and naming the reserve being credited."
             ),
             .init(
                 number: 5,
+                title: "CPF debt paydown \u{2014} already done, and mostly not from this money",
+                amount: BudgetRecommendations2027.cpfAccelerationPayment,
+                detail: "This one is history rather than a proposal. On July 7, 2026 the Board adopted Resolution 2026-642 unanimously, retiring the remaining Community Preservation Fund land-preservation debt five years ahead of its 2030 maturity and saving about $660,000 in future interest. The money came almost entirely from the CPF's own fund balance \u{2014} about $7.2M on top of the $2.75M already budgeted for the year\u{2019}s debt service \u{2014} which is a separate fund and never part of the General Fund surplus shown above. Only about $92,000 of General Fund balance was needed, because a small slice of the same 2018 bond series is tied to the General Fund. The CPF was left holding roughly $20.1M."
+            ),
+            .init(
+                number: 6,
                 title: "File a round of community block grants",
                 amount: BudgetRecommendations2027.communityBlockGrantsTotal,
                 detail: "Reserve one-time grant applications to four community-service nonprofits serving Riverhead and the East End as targeted community-support investments that do not create a recurring operating obligation. See the breakdown below."
             ),
             .init(
-                number: 6,
+                number: 7,
                 title: "Launch a community improvement micro-grant series",
                 amount: BudgetRecommendations2027.communityImprovementGrantSeries,
                 detail: "Reserve one-time funding for a visible run of small grants of about $500 to $1,000 each, up to $50,000 total, for block-scale beautification, civic ideas, or neighborhood improvement projects."
             ),
             .init(
-                number: 7,
+                number: 8,
                 title: "Fund a visible innovation and service package",
                 amount: BudgetRecommendations2027.addedServiceInvestments,
                 detail: "This covers the app's current improvement package: building capacity, online modernization, added code enforcement, one Town Clerk position, and two police positions."
             )
         ]
+    }
+
+    @ViewBuilder
+    private func reserveOptionRow(citation: String, name: String, exposure: String, detail: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(citation)
+                    .font(.caption2.weight(.heavy))
+                    .foregroundStyle(RiverheadTheme.brandGold)
+                Text(name)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(RiverheadTheme.brandNavy)
+            }
+            Text(exposure)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(RiverheadTheme.textPrimary)
+            Text(detail)
+                .font(.caption2)
+                .foregroundStyle(RiverheadTheme.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(RiverheadTheme.cardBackground, in: RoundedRectangle(cornerRadius: 10))
     }
 
     private var remainingAfterDeploymentOptions: Double {
@@ -2871,8 +2905,66 @@ fileprivate struct FundBalanceDashboardView: View {
             }
 
             GlassCard(
+                title: "Spending it is not the only option",
+                subtitle: "Every line above spends the money. There is a third choice: lock some of it away for a bill the Town already knows is coming."
+            ) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Savings and a reserve are not the same thing. Savings can be spent on anything the Board decides next year. A reserve is money set aside by law for one named purpose \u{2014} the Board has to vote to get it back out, and residents can see what it is for. New York lets a town create only the reserves listed in General Municipal Law \u{00A7}\u{00A7} 6-c through 6-r, and three of them line up with bills Riverhead is already carrying.")
+                        .font(.footnote)
+                        .foregroundStyle(RiverheadTheme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    reserveOptionRow(
+                        citation: "GML \u{00A7} 6-p",
+                        name: "Employee Benefit Accrued Liability Reserve",
+                        exposure: "Owed to staff for unused time off: $11,608,615",
+                        detail: "Pays out accumulated sick, vacation and holiday time when employees separate. The liability has risen every year since 2023, and the 2026 retirement incentive converts part of it to cash inside a single budget year."
+                    )
+
+                    reserveOptionRow(
+                        citation: "GML \u{00A7} 6-r",
+                        name: "Retirement Contribution Reserve",
+                        exposure: "Riverhead\u{2019}s share of the State pension shortfall: $27,346,801",
+                        detail: "Absorbs swings in the Town's NYSLRS and PFRS bills. Riverhead's share moved from $21.4M to $27.3M in a single year on investment returns alone \u{2014} movement the Town does not control and cannot budget away."
+                    )
+
+                    reserveOptionRow(
+                        citation: "GML \u{00A7} 6-e",
+                        name: "Contingency and Tax Stabilization Reserve",
+                        exposure: "Most the Town could put in: about $7,703,241",
+                        detail: "The one written for the problem the Town actually has. It may be used to lessen or prevent a projected levy increase above 2\u{00BD}%, and to absorb unanticipated revenue losses. For a town the ceiling is 10% of the town-wide general and highway funds \u{2014} about $77.0M for 2026. Establishing it takes a board resolution subject to permissive referendum, and spending from it needs the chief executive officer\u{2019}s recommendation plus a two-thirds board vote. If the balance ever exceeds the 10% ceiling, the excess must go to reducing the next year\u{2019}s levy."
+                    )
+
+                    Text("The first two are created by board resolution and need no referendum; the tax-stabilization reserve is subject to permissive referendum. What the law does not offer is a retiree-health (OPEB) trust \u{2014} there is no such reserve in the statute, which is why the Town's $129.5M OPEB liability cannot be pre-funded no matter how large the surplus gets.")
+                        .font(.caption2)
+                        .foregroundStyle(RiverheadTheme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    NavigationLink {
+                        ReserveFundBreakdownView()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "list.bullet.rectangle")
+                            Text("See every reserve type a NY town may create")
+                            Spacer()
+                            Image(systemName: "chevron.right").font(.caption2)
+                        }
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(RiverheadTheme.brandNavy)
+                        .padding(.vertical, 8)
+                    }
+                    .buttonStyle(.plain)
+
+                    Text("Sources: NYS Comptroller, \u{201C}Reserve Funds\u{201D} (Local Government Management Guide); General Municipal Law Article 2. Liability figures from the 2025 Annual Financial Report, Schedule W (accounts 687 and 638).")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            GlassCard(
                 title: "Community block grants — who would get funded",
-                subtitle: "The breakdown behind deployment option #5 above: four nonprofits serving Riverhead and the East End. These amounts are the app's own illustrative sizing, not an official Town budget line or commitment."
+                subtitle: "The breakdown behind deployment option #6 above: four nonprofits serving Riverhead and the East End. These amounts are the app's own illustrative sizing, not an official Town budget line or commitment."
             ) {
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(BudgetRecommendations2027.communityBlockGrants) { grant in
@@ -3014,10 +3106,10 @@ fileprivate struct FundBalanceDashboardView: View {
             }
 
             SourcesStrip(links: [
-                .init(title: "2026 Tentative Budget",
+                .init(title: "2026 Adopted Budget",
                       kind: .budgetBook,
                       note: nil,
-                      url: URL(string: "https://www.townofriverheadny.gov/DocumentCenter/View/2779/2026-Tentative-Budget-PDF")),
+                      url: URL(string: "https://www.townofriverheadny.gov/DocumentCenter/View/2967/2026-Adopted-Budget")),
                 .init(title: "2026 Budget Supplement",
                       kind: .budgetBook,
                       note: nil,
@@ -3185,7 +3277,11 @@ struct DebtInstrument: Identifiable {
     let kind: Kind
     let outstanding: Double
     let yearsRemaining: Int
-    let ratePercent: Double
+    /// Coupon or coupon range, where an audit publishes one. The Annual
+    /// Financial Report's Statement of Indebtedness does not print rates, so
+    /// several issues legitimately have none and must not be given a made-up
+    /// number.
+    let rateLabel: String?
 }
 
 enum CapitalFundingChoice: String, CaseIterable, Identifiable {
@@ -3206,28 +3302,67 @@ enum CapitalFundingChoice: String, CaseIterable, Identifiable {
 
 @MainActor
 fileprivate struct CapitalDebtExplorerView: View {
+
+
+    @ViewBuilder
+    private func oscDebtMetricRow(n: String, name: String, reading: String, detail: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(n)
+                    .font(.caption2.weight(.heavy))
+                    .foregroundStyle(.white)
+                    .frame(width: 18, height: 18)
+                    .background(RiverheadTheme.brandNavy, in: Circle())
+                Text(name)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(RiverheadTheme.brandNavy)
+                Spacer()
+                Text(reading)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(RiverheadTheme.brandGold)
+            }
+            Text(detail)
+                .font(.caption2)
+                .foregroundStyle(RiverheadTheme.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(RiverheadTheme.cardBackground, in: RoundedRectangle(cornerRadius: 10))
+    }
     let mode: BudgetAudienceMode
 
-    // 2026 Tentative Budget – debt service summary from the budget document.
-    // The 2026 tentative budget includes debt service appropriations across multiple funds.
-    // These figures are sourced from the 2026 Budget Supplement (published Oct 1, 2025).
+    // Every bond and note outstanding at December 31, 2025, from the Statement
+    // of Indebtedness in the 2025 Annual Financial Report. These ten sum to
+    // $60,398,858 and tie exactly to the filing's own Debt Summary. Coupon
+    // ranges come from the 2024 audited statements, which is the newest source
+    // that prints them; issues the audit does not name carry no rate here
+    // rather than an invented one.
+    //
+    // Previously this list held three round placeholder amounts totalling
+    // $7.2M, which contradicted the Town's real debt by an order of magnitude.
     private var debt: [DebtInstrument] {
         [
-            .init(name: "General Fund Bonds & Notes",
-                  kind: .serialBond,
-                  outstanding: 4_200_000.0,
-                  yearsRemaining: 10,
-                  ratePercent: 2.80),
-            .init(name: "Highway Fund Debt Service",
-                  kind: .serialBond,
-                  outstanding: 2_100_000.0,
-                  yearsRemaining: 8,
-                  ratePercent: 3.10),
-            .init(name: "Capital Fund BANs",
-                  kind: .ban,
-                  outstanding: 900_000.0,
-                  yearsRemaining: 1,
-                  ratePercent: 3.50)
+            .init(name: "Buying the Town Hall properties",
+                  kind: .ban, outstanding: 19_250_000, yearsRemaining: 2, rateLabel: nil),
+            .init(name: "2018 refinancing of older borrowing",
+                  kind: .serialBond, outstanding: 9_940_000, yearsRemaining: 4, rateLabel: "4.000\u{2013}5.000%"),
+            .init(name: "Sewer work, State clean-water loan (2016)",
+                  kind: .serialBond, outstanding: 7_360_000, yearsRemaining: 10, rateLabel: "0.698\u{2013}3.073%"),
+            .init(name: "Water district and downtown parking (2021)",
+                  kind: .serialBond, outstanding: 5_660_000, yearsRemaining: 10, rateLabel: "2.00\u{2013}5.00%"),
+            .init(name: "Water district work (2024, newest bond)",
+                  kind: .serialBond, outstanding: 4_975_000, yearsRemaining: 13, rateLabel: nil),
+            .init(name: "2019 refinancing of older borrowing",
+                  kind: .serialBond, outstanding: 3_560_000, yearsRemaining: 5, rateLabel: nil),
+            .init(name: "Water district work (2018)",
+                  kind: .serialBond, outstanding: 3_435_000, yearsRemaining: 7, rateLabel: nil),
+            .init(name: "Sewer work, State clean-water loan (2024)",
+                  kind: .serialBond, outstanding: 3_108_858, yearsRemaining: 27, rateLabel: "interest-free"),
+            .init(name: "Buying the Town Square parcels",
+                  kind: .ban, outstanding: 2_725_000, yearsRemaining: 0, rateLabel: nil),
+            .init(name: "Sewer work, State clean-water loan (2021)",
+                  kind: .serialBond, outstanding: 385_000, yearsRemaining: 5, rateLabel: nil)
         ]
     }
 
@@ -3239,10 +3374,45 @@ fileprivate struct CapitalDebtExplorerView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             GlassCard(
+                title: "Is this a lot of debt?",
+                subtitle: "There is no single number that answers that. The State Comptroller lists four things lenders actually look at \u{2014} here is how Riverhead reads on each."
+            ) {
+                VStack(alignment: .leading, spacing: 12) {
+                    oscDebtMetricRow(
+                        n: "1",
+                        name: "Can the Town pay its bills?",
+                        reading: "Yes",
+                        detail: "Lenders start with cash on hand, savings, and whether a town has to borrow just to make payroll. Riverhead ended 2025 with $33.4M in the bank, $29.7M of it unrestricted, and it does not borrow for cash flow \u{2014} its short-term notes all paid for buildings and land."
+                    )
+                    oscDebtMetricRow(
+                        n: "2",
+                        name: "Is it saving for the next project?",
+                        reading: "No",
+                        detail: "The Comptroller expects a town to put money aside each year for the roof, the truck, the water main \u{2014} in a formal capital reserve, so the cash is there when the bill comes. Riverhead has essentially none: $17,924 of restricted balance at the end of 2025, and all of that is opioid-settlement money. This is the weak spot of the four."
+                    )
+                    oscDebtMetricRow(
+                        n: "3",
+                        name: "Paying cash, or borrowing?",
+                        reading: "Cash, lately",
+                        detail: "The guidance is to lean on cash in good years and save borrowing for lean ones. Riverhead borrowed nothing at all in 2025 and paid off $6,361,040 of principal, then retired the CPF and Town Square notes early in 2026. That is the pattern the Comptroller is asking for."
+                    )
+                    oscDebtMetricRow(
+                        n: "4",
+                        name: "How close to the legal ceiling?",
+                        reading: "6.74% used",
+                        detail: "The State caps how much a town may borrow, and Riverhead is using 6.74% of its cap \u{2014} not close to it. Two other measures the Comptroller names: about $1,686 of debt per resident ($60,398,858 spread across 35,826 people), and debt payments running roughly 8% of General Fund spending ($5,285,239 through the Debt Service fund in 2025). A fourth \u{2014} debt against the full market value of taxable property \u{2014} needs a figure the Town does not publish in this filing, so it is left blank rather than guessed."
+                    )
+
+                    Text("Source: NYS Comptroller, \u{201C}Multiyear Capital Planning\u{201D} and \u{201C}Capital Projects Fund\u{201D} (Local Government Management Guides). Debt figures from the 2025 Annual Financial Report; debt-limit percentage from the 2024 audited statements.")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            GlassCard(
                 title: "Current debt picture",
-                subtitle: mode == .resident
-                    ? "What the Town owes on bonds and notes right now, and how long it'll take to pay off."
-                    : "Outstanding principal by debt type. Debt service appropriations appear across General, Highway, and Capital funds in the 2026 tentative budget."
+                subtitle: "Every bond and note the Town still owes, largest first, as of December 31, 2025. They add up to $60,398,858."
             ) {
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(debt) { item in
@@ -3258,7 +3428,7 @@ fileprivate struct CapitalDebtExplorerView: View {
                             VStack(alignment: .trailing, spacing: 2) {
                                 Text(item.outstanding, format: .currency(code: "USD"))
                                     .font(.subheadline.weight(.semibold))
-                                Text("\(item.yearsRemaining) yrs @ \(item.ratePercent, specifier: "%.1f")%")
+                                Text(item.rateLabel.map { "\(item.yearsRemaining) yrs @ \($0)" } ?? "\(item.yearsRemaining) yrs \u{00B7} rate not published")
                                     .font(.caption2)
                                     .foregroundStyle(.secondary)
                             }
@@ -3350,10 +3520,10 @@ fileprivate struct CapitalDebtExplorerView: View {
             }
 
             SourcesStrip(links: [
-                .init(title: "2026 Tentative Budget",
+                .init(title: "2026 Adopted Budget",
                       kind: .budgetBook,
                       note: nil,
-                      url: URL(string: "https://www.townofriverheadny.gov/DocumentCenter/View/2779/2026-Tentative-Budget-PDF")),
+                      url: URL(string: "https://www.townofriverheadny.gov/DocumentCenter/View/2967/2026-Adopted-Budget")),
                 .init(title: "2026 Budget Supplement",
                       kind: .budgetBook,
                       note: nil,
@@ -3426,7 +3596,7 @@ struct BudgetOutlier: Identifiable {
 fileprivate struct OutlierWatchView: View {
     let mode: BudgetAudienceMode
 
-    // 2026 vs 2025 adopted budget changes — sourced from the 2026 Tentative Budget and Supplement.
+    // 2026 vs 2025 adopted budget changes — sourced from the 2026 Adopted Budget and Supplement.
     // These are the largest year-over-year appropriation changes by department/category.
     private var sampleOutliers: [BudgetOutlier] {
         [
@@ -3464,7 +3634,7 @@ fileprivate struct OutlierWatchView: View {
                 title: "What changed the most?",
                 subtitle: mode == .resident
                     ? "Which departments' spending jumped the most from 2025 to 2026."
-                    : "Year-over-year appropriation changes by department. Source: 2026 Tentative Budget vs. 2025 Adopted Budget."
+                    : "Year-over-year appropriation changes by department. Source: 2026 Adopted Budget vs. 2025 Adopted Budget."
             ) {
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(sampleOutliers) { item in
@@ -3531,10 +3701,10 @@ fileprivate struct OutlierWatchView: View {
             }
 
             SourcesStrip(links: [
-                .init(title: "2026 Tentative Budget",
+                .init(title: "2026 Adopted Budget",
                       kind: .budgetBook,
                       note: nil,
-                      url: URL(string: "https://www.townofriverheadny.gov/DocumentCenter/View/2779/2026-Tentative-Budget-PDF")),
+                      url: URL(string: "https://www.townofriverheadny.gov/DocumentCenter/View/2967/2026-Adopted-Budget")),
                 .init(title: "2025 Adopted Budget",
                       kind: .budgetBook,
                       note: nil,

@@ -166,6 +166,7 @@ struct Budget2027SpendingReductionView: View {
         List {
             // Answer first: the real cap gap and the plan that closes it.
             capGapSection
+            personalServicesRateSection
             retirementLeverSection
 
             // Then the interactive tool to explore/build the package.
@@ -276,12 +277,80 @@ struct Budget2027SpendingReductionView: View {
 
     // MARK: - The real cap gap, and the path through a split board
 
+    // Why the projected levy moved: Personal Services is no longer one flat
+    // 3.5% for everyone but a payroll-weighted blend of each bargaining unit's
+    // own 2027 terms. Mirrors the web edition's predict-2027 breakdown.
+    @ViewBuilder private var personalServicesRateSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(CloseTheGap2027.unionBreakdownNote)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                ForEach(CloseTheGap2027.unionBreakdown) { group in
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack(alignment: .firstTextBaseline) {
+                            Text(group.union)
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(RiverheadTheme.brandNavy)
+                            Spacer(minLength: 8)
+                            Text("+\(group.ratePct.formatted())%")
+                                .font(.subheadline.weight(.heavy))
+                                .foregroundStyle(RiverheadTheme.brandCoral)
+                            if !group.known2027 {
+                                Text("est.")
+                                    .font(.caption2.weight(.semibold))
+                                    .foregroundStyle(RiverheadTheme.brandGold)
+                            }
+                        }
+                        Text("\(group.payrollSharePct.formatted())% of payroll\(group.term.map { " · \($0)" } ?? "")")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Text(group.source)
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.vertical, 3)
+                }
+
+                Text(CloseTheGap2027.unionBreakdownEstimateNote)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Divider()
+
+                Text("Pension costs are partly excluded from the cap")
+                    .font(.subheadline.weight(.semibold))
+                Text("New York lets a municipality exclude the part of a pension contribution-rate rise above 2 percentage points. For SFY 2026-27 only the police system clears that bar: PFRS rose \(CloseTheGap2027.PensionExclusion.pfrsRateIncreasePts.formatted()) points (\(CloseTheGap2027.PensionExclusion.pfrsExcessPts.formatted()) over the threshold), while ERS rose \(CloseTheGap2027.PensionExclusion.ersRateIncreasePts.formatted()) points and earns no exclusion. That is worth about \(CloseTheGap2027.PensionExclusion.totalEstimate, format: .currency(code: "USD").precision(.fractionLength(0))) of headroom against the gap above.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(CloseTheGap2027.PensionExclusion.source)
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text(CloseTheGap2027.capGapCaveat)
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.vertical, 4)
+        } header: {
+            Text("How the Personal Services rate is built")
+        }
+    }
+
     @ViewBuilder private var capGapSection: some View {
         Section {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Two different “gaps” — and which one actually binds")
                     .font(.headline)
-                Text("There are two numbers. The payroll-pressure gap (\(payrollPressureGap, format: .currency(code: "USD").precision(.fractionLength(0)))) is the recurring cost of standing still. The one that actually forces a decision is bigger: the projected 2027 levy overshoots New York's 2% property-tax cap by about \(capGap, format: .currency(code: "USD").precision(.fractionLength(0))) (a ~\(Int(CloseTheGap2027.predictedLevyPct))% levy against a ~\(Int(CloseTheGap2027.capBasePct))% ceiling). That is the real overage to resolve.")
+                Text("There are two numbers. The payroll-pressure gap (\(payrollPressureGap, format: .currency(code: "USD").precision(.fractionLength(0)))) is the recurring cost of standing still. The one that actually forces a decision is bigger: the projected 2027 levy overshoots New York's 2% property-tax cap by about \(capGap, format: .currency(code: "USD").precision(.fractionLength(0))) (a ~\(CloseTheGap2027.predictedLevyPct.formatted())% levy against a ~\(Int(CloseTheGap2027.capBasePct))% ceiling). That is the real overage to resolve.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -413,7 +482,7 @@ struct Budget2027SpendingReductionView: View {
             }
             .frame(height: 8)
 
-            Text("\(rawGapCoverage.formatted(.percent.precision(.fractionLength(0)))) of the \(payrollPressureGap, format: .currency(code: "USD").precision(.fractionLength(0))) modeled 2027 payroll-pressure gap\(rawGapCoverage >= 1 ? " — fully covered" : "") — the smaller of the two gaps; the ~$2.62M cap-piercing gap above is the one that actually binds.")
+            Text("\(rawGapCoverage.formatted(.percent.precision(.fractionLength(0)))) of the \(payrollPressureGap, format: .currency(code: "USD").precision(.fractionLength(0))) modeled 2027 payroll-pressure gap\(rawGapCoverage >= 1 ? " — fully covered" : "") — the smaller of the two gaps; the ~$2.76M cap-piercing gap above is the one that actually binds.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

@@ -30,7 +30,7 @@ final class RBBudgetStore {
 
     var municipality: RBMunicipality = .riverhead
     var appTitle: String = "Riverhead NY Budget App"
-    var fiscalYearTitle: String = "2026 Tentative Budget"
+    var fiscalYearTitle: String = "2026 Adopted Budget"
 
     // MARK: - Fund Balance (General Fund)
 

@@ -15,6 +15,31 @@ struct LocalNewsEconomyView: View {
         let detail: String
     }
 
+    /// Largest industries by people employed. Note the reconciliation caveat in
+    /// `industryNote`: the employer-firm count and this breakdown come from
+    /// different Census products and do not sum to one table.
+    private struct IndustryRow: Identifiable {
+        let id = UUID()
+        let rank: Int
+        let industry: String
+        let employees: Int
+    }
+
+    private let topIndustries2024: [IndustryRow] = [
+        .init(rank: 1, industry: "Health Care & Social Assistance", employees: 1_009),
+        .init(rank: 2, industry: "Construction", employees: 806),
+        .init(rank: 3, industry: "Administrative & Support & Waste Management Services", employees: 728)
+    ]
+
+    private let totalEmployerFirms = 1_424
+    private let totalEmployerFirmsYear = 2022
+    private let totalEmployment2024 = 6_520
+    private let employmentGrowth2023to2024Pct = 1.72
+
+    private let industryNote = "Employer-firm count and industry breakdown are from different Census products (County Business Patterns firm counts vs. American Community Survey-derived employment by industry, both aggregated by Data USA / Census QuickFacts), so they don't reconcile to a single table — a full establishment-by-industry breakdown (e.g. retail, accommodation & food service, wholesale) wasn't accessible this pass; these are the three largest sectors by people employed, not by establishment count."
+
+    private let industrySource = "U.S. Census Bureau, County Business Patterns (via Census Bureau QuickFacts, Riverhead town, Suffolk County, NY), and Data USA (Census-derived employment by industry)."
+
     private let outlets: [Outlet] = [
         .init(name: "RiverheadLOCAL", blurb: "Daily local coverage focused on Riverhead.", url: URL(string: "https://riverheadlocal.com/")!),
         .init(name: "Riverhead News-Review", blurb: "Community reporting and local town coverage.", url: URL(string: "https://riverheadnewsreview.timesreview.com/")!),
@@ -56,7 +81,7 @@ struct LocalNewsEconomyView: View {
             .init(
                 label: "Businesses",
                 value: "1,424",
-                detail: "All employer firms (reference year 2022)."
+                detail: "All employer firms, reference year 2022 (Census County Business Patterns). Broken out by industry below."
             ),
             .init(
                 label: "Current Unemployment (Closest Official Local)",
@@ -105,6 +130,66 @@ struct LocalNewsEconomyView: View {
                     }
                     .padding(.vertical, 4)
                 }
+            }
+
+            Section("Businesses & Industries") {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Employer businesses")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        Text(totalEmployerFirms.formatted())
+                            .font(.title3.weight(.bold))
+                            .foregroundStyle(RiverheadTheme.accent)
+                        Text("All employer firms, \(String(totalEmployerFirmsYear))")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer(minLength: 12)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Total employment")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        Text(totalEmployment2024.formatted())
+                            .font(.title3.weight(.bold))
+                            .foregroundStyle(RiverheadTheme.brandNavy)
+                        Text("2024, +\(employmentGrowth2023to2024Pct.formatted())% vs 2023")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.vertical, 4)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Largest industries by people employed (2024)")
+                        .font(.subheadline.weight(.semibold))
+                    ForEach(topIndustries2024) { row in
+                        HStack(alignment: .firstTextBaseline, spacing: 10) {
+                            Text("\(row.rank)")
+                                .font(.caption.weight(.heavy))
+                                .foregroundStyle(row.rank == 1 ? RiverheadTheme.accent : .secondary)
+                                .frame(width: 16, alignment: .leading)
+                            Text(row.industry)
+                                .font(.footnote.weight(row.rank == 1 ? .semibold : .regular))
+                                .fixedSize(horizontal: false, vertical: true)
+                            Spacer(minLength: 8)
+                            Text("\(row.employees.formatted()) employees")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                .padding(.vertical, 4)
+
+                Text(industryNote)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text("Source: \(industrySource)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             Section("Tax Base & Largest Taxpayers") {

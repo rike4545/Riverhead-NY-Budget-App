@@ -49,7 +49,7 @@ private enum CandidateCBData {
             planks: [
                 CBPlank(
                     proposal: "Keep a tight lid on Town spending.",
-                    benefit: "Directly attacks the ~$2.62M by which the 2027 levy is projected to pierce the 2% tax cap. The app already identifies ~$2.1M in firm, individually-sourced recurring trims — so “hold the line” is not an empty slogan here; the line items exist.",
+                    benefit: "Directly attacks the ~$2.76M by which the 2027 levy is projected to pierce the 2% tax cap. The app already identifies ~$2.1M in firm, individually-sourced recurring trims — so “hold the line” is not an empty slogan here; the line items exist.",
                     cost: "Most of the budget base is personnel and mandated costs (pension, debt service, insurance) a freeze can't touch. Real restraint means audits, held vacancies, and deferred equipment — each trading a dollar saved for a service or a delayed repair.",
                     tradeoff: "The two largest cost drivers — the PBA and SOA contracts — expire 12/31/2026 and settle through binding arbitration, not a Supervisor's pen. Much of the 2027 payroll pressure is locked until those settle."
                 ),
@@ -84,7 +84,7 @@ private enum CandidateCBData {
                 CBPlank(
                     proposal: "Lower the cost of taxes — the campaign's stated top issue.",
                     benefit: "Direct, immediately felt relief for every property owner, and the Town has a large cushion to work from: a $33.4M General Fund balance, of which $29.7M is unassigned and actually available.",
-                    cost: "An actual levy cut (versus merely holding growth) widens the ~$2.62M cap gap rather than closing it — the reduction has to be found on top of the gap. Funding a cut from reserves spends one-time money on a recurring obligation.",
+                    cost: "An actual levy cut (versus merely holding growth) widens the ~$2.76M cap gap rather than closing it — the reduction has to be found on top of the gap. Funding a cut from reserves spends one-time money on a recurring obligation.",
                     tradeoff: "The NY tax cap already caps levy growth at ~2%; the fiscal distance between “hold at the cap” and “actually lower” is large, and this plank must be squared with the new-spending planks below."
                 ),
                 CBPlank(
@@ -118,21 +118,21 @@ private enum CandidateCBData {
 
     static let common = [
         "Both run on tax-base growth over levy increases, and both promise spending restraint — on fiscal strategy they are more alike than different.",
-        "Both face the same unnamed constraint: the ~$2.62M by which the 2027 levy is projected to pierce the tax cap, and the PBA/SOA contracts expiring 12/31/2026 that settle by binding arbitration.",
+        "Both face the same unnamed constraint: the ~$2.76M by which the 2027 levy is projected to pierce the tax cap, and the PBA/SOA contracts expiring 12/31/2026 that settle by binding arbitration.",
     ]
     static let divergence = [
         "The incumbent's platform is mostly “hold and grow” — restraint plus development — which maps onto the identified trims but is slow on the revenue side.",
         "The challenger adds concrete new-spending planks (veterans, police, clean water) alongside an explicit tax cut, which sharpens the appeal but requires naming an offset the platform hasn't yet specified.",
         "Both share the development-versus-open-space tension; neither has reconciled it in dollar terms.",
     ]
-    static let scorecard = "Neither platform, as stated, closes the ~$2.62M cap gap on paper. That is the honest scorecard: the ideas are directionally sound, but the arithmetic to hit the cap still has to be shown."
+    static let scorecard = "Neither platform, as stated, closes the ~$2.76M cap gap on paper. That is the honest scorecard: the ideas are directionally sound, but the arithmetic to hit the cap still has to be shown."
 
     // Beyond the campaigns — a neutral fiscal observer's view.
     static let neutralIntro = "Set the campaigns aside. Riverhead has leaned on above-cap levy increases and cap overrides in several recent years — a 7.89% levy increase in the 2025 budget, and adopted overrides in 2023, 2024, and 2026. When a town overrides the cap that often, the issue is usually structural: recurring costs are outgrowing recurring revenue, and the gap is closed late, at adoption, rather than planned for."
     static let history = [
         "2025 adopted budget: ~7.89% tax-levy increase.",
         "Tax-cap overrides adopted in 2023, 2024, and 2026.",
-        "2027 projection: the levy again pierces the ~2% cap, by about $2.62M.",
+        "2027 projection: the levy again pierces the ~2% cap, by about $2.76M.",
     ]
     static let principles: [(String, String)] = [
         ("Fund recurring costs with recurring revenue", "The most common structural error is patching an operating gap with one-time money — appropriated fund balance, one-off sales. It balances this year and guarantees the same gap next year. A simple rule — reserves only for one-time or emergency needs — prevents the cliff."),
