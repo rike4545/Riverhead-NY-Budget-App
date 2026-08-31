@@ -274,6 +274,7 @@ struct BudgetAccuracyWatchlistView: View {
                 }
             }
 
+            sevenYearSections
             dataDrivenSections
         }
         .navigationTitle("Budget Accuracy")
@@ -281,6 +282,112 @@ struct BudgetAccuracyWatchlistView: View {
     }
 
     // MARK: - Data-driven flags (from the shared Supplement ETL)
+
+    @ViewBuilder
+    private var sevenYearSections: some View {
+        if let h = SupplementData.history {
+            Section {
+                Text(h.note)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Seven-Year View \u{00B7} 2020\u{2013}2026 Supplements")
+            }
+
+            if !h.underBudgeted.isEmpty {
+                Section {
+                    Text("These sit at or near zero for years, so any single-year comparison reads them as dead lines. Then the bill arrives. Together the 2026 budget is \(h.underBudgeted.reduce(0) { $0 + $1.shortfall }.formatted(.currency(code: "USD").precision(.fractionLength(0)))) short of what they cost in the years they actually happened.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                    ForEach(h.underBudgeted) { line in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(line.name)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(RiverheadTheme.brandNavy)
+                            sparkline(line.series)
+                            HStack {
+                                Text("Costs \(line.averageWhenActive.formatted(.currency(code: "USD").precision(.fractionLength(0)))) when it happens")
+                                Spacer()
+                                Text("2026: \(line.tentative2026.formatted(.currency(code: "USD").precision(.fractionLength(0))))")
+                                    .foregroundStyle(line.tentative2026 == 0 ? RiverheadTheme.brandCoral : RiverheadTheme.textSecondary)
+                            }
+                            .font(.caption2)
+                            .foregroundStyle(RiverheadTheme.textSecondary)
+                        }
+                        .padding(.vertical, 2)
+                    }
+                } header: {
+                    Text("Goes Quiet, Then Costs Real Money")
+                }
+            }
+
+            if !h.dueIn2027.isEmpty {
+                Section {
+                    Text("Spending here repeats on an interval rather than every year. The last spike and the interval put the next one in 2027 \u{2014} the budget being written now.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                    ForEach(h.dueIn2027) { c in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(c.name)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(RiverheadTheme.brandNavy)
+                            Text("Every \(c.periodYears) years \u{00B7} last \(String(c.spikeYears.last ?? 0))")
+                                .font(.caption2.weight(.bold))
+                                .foregroundStyle(RiverheadTheme.brandGold)
+                            sparkline(c.series)
+                            Text("About \(c.spikeAverage.formatted(.currency(code: "USD").precision(.fractionLength(0)))) when it lands; the 2026 budget carries \(c.tentative2026.formatted(.currency(code: "USD").precision(.fractionLength(0)))).")
+                                .font(.caption2)
+                                .foregroundStyle(RiverheadTheme.textSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(.vertical, 2)
+                    }
+                } header: {
+                    Text("On A Cycle, Due Again In 2027")
+                }
+            }
+
+            if !h.renumbered.isEmpty {
+                Section {
+                    Text("These accounts stopped and an identically-named one started. Nothing was cut and nothing appeared from nowhere \u{2014} the money changed account numbers. Listed so neither half is read as a finding.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                    ForEach(h.renumbered) { r in
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(r.name)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(RiverheadTheme.brandNavy)
+                            Text("\(r.oldAccount) through \(String(r.lastYear))")
+                                .font(.caption2)
+                                .foregroundStyle(RiverheadTheme.textSecondary)
+                            Text("\(r.newAccount) from \(String(r.firstYear))")
+                                .font(.caption2)
+                                .foregroundStyle(RiverheadTheme.textSecondary)
+                        }
+                        .padding(.vertical, 2)
+                    }
+                } header: {
+                    Text("Renumbered, Not Abandoned")
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func sparkline(_ series: [String: Double]) -> some View {
+        let years = series.keys.sorted()
+        let peak = max(series.values.map { abs($0) }.max() ?? 1, 1)
+        HStack(alignment: .bottom, spacing: 3) {
+            ForEach(years, id: \.self) { y in
+                let v = series[y] ?? 0
+                RoundedRectangle(cornerRadius: 1.5)
+                    .fill(v > 0 ? RiverheadTheme.brandSky : RiverheadTheme.textSecondary.opacity(0.25))
+                    .frame(width: 8, height: max(2, CGFloat(abs(v) / peak) * 26))
+            }
+        }
+        .frame(height: 28, alignment: .bottom)
+        .accessibilityHidden(true)
+    }
 
     @ViewBuilder
     private var dataDrivenSections: some View {

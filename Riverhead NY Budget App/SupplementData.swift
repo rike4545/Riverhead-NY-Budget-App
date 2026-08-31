@@ -88,12 +88,69 @@ struct SupplementLine: Identifiable, Decodable, Hashable {
 
 private struct SupplementLinesFile: Decodable { let lines: [SupplementLine] }
 
+// MARK: - Multi-year history (2020-2026 supplements)
+
+// Each supplement prints an actual from two years back, so stacking seven of
+// them gives an unbroken 2018-2024 actual on the same account. That span is
+// what separates a line genuinely over budget from one that simply runs on a
+// multi-year cycle and happens to be in an off year.
+
+struct SupplementCyclicalLine: Identifiable, Decodable {
+    let account: String
+    let name: String
+    let series: [String: Double]
+    let spikeYears: [Int]
+    let periodYears: Int
+    let nextDue: Int
+    let spikeAverage: Double
+    let adopted2025: Double
+    let tentative2026: Double
+
+    var id: String { account }
+}
+
+struct SupplementUnderBudgetedLine: Identifiable, Decodable {
+    let account: String
+    let name: String
+    let series: [String: Double]
+    let quietYears: Int
+    let averageWhenActive: Double
+    let peak: Double
+    let adopted2025: Double
+    let tentative2026: Double
+    let shortfall: Double
+
+    var id: String { account }
+}
+
+struct SupplementRenumberedLine: Identifiable, Decodable {
+    let name: String
+    let oldAccount: String
+    let lastYear: Int
+    let newAccount: String
+    let firstYear: Int
+    let peak: Double
+
+    var id: String { oldAccount }
+}
+
+struct SupplementHistoryFile: Decodable {
+    let actualYears: [Int]
+    let accountsTracked: Int
+    let cyclical: [SupplementCyclicalLine]
+    let dueIn2027: [SupplementCyclicalLine]
+    let underBudgeted: [SupplementUnderBudgetedLine]
+    let renumbered: [SupplementRenumberedLine]
+    let note: String
+}
+
 // MARK: - Loader
 
 enum SupplementData {
     static let reductions: SupplementReductionsFile? = load("reductions")
     static let outliers: SupplementOutliersFile? = load("supplement-outliers")
     static let lines: [SupplementLine] = (load("supplement-lines") as SupplementLinesFile?)?.lines ?? []
+    static let history: SupplementHistoryFile? = load("supplement-history")
 
     private static func load<T: Decodable>(_ resource: String) -> T? {
         guard let url = Bundle.main.url(forResource: resource, withExtension: "json"),
